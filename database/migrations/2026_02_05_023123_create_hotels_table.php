@@ -11,9 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kelasnyas', function (Blueprint $table) {
+        Schema::create('hotels', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('nama_kelas');
+            $table->string('nama_hotel');
+            $table->string('lokasi_hotel');
+            $table->string('kontak_hotel');
+            $table->string('email_hotel')->nullable();;
+            $table->string('rating_hotel');
+            $table->unsignedBigInteger('harga_hotel');
+            $table->string('catatan_hotel')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -24,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kelasnyas');
+        Schema::dropIfExists('hotels');
     }
 };

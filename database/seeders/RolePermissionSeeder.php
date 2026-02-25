@@ -14,15 +14,14 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
         $adminRole = Role::create(['name'=> 'admin']);
-
-        $ustadzRole = Role::create(['name'=> 'ustadz']);
-
-        $siswaRole = Role::create(['name'=> 'siswa']);
+        $managementRole = Role::create(['name'=> 'management']);
+        $staffRole = Role::create(['name'=> 'staff']);
+        $agenRole = Role::create(['name'=> 'agen']);
 
         $userOwner =  User::create([
             'name'  => 'Fulan',
             'avatar'  => 'images/default-avatar.png',
-            'email'  => 'admin@email.com',
+            'email'  => 'admin@umrohsafarindo.com',
             'password'  => bcrypt('123123123'),
         ]);
 

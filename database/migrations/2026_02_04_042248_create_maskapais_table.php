@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ustadzs', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->unsignedInteger('kelompok_id');
-            $table->foreign('kelompok_id')->references('id')->on('kelompoks')->onDelete('cascade');
-            $table->enum('kelamin', ['laki-laki', 'perempuan']);
+        Schema::create('maskapais', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('nama_maskapai');
+            $table->enum('rute_terbang', ['direct', 'transit']);
+            $table->unsignedInteger('lama_perjalanan');
+            $table->unsignedBigInteger('harga_tiket');
+            $table->string('catatan_keberangkatan')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ustadzs');
+        Schema::dropIfExists('maskapais');
     }
 };

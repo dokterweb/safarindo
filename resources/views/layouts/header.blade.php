@@ -76,21 +76,54 @@
                 <span class="nav-link-icon d-md-none d-lg-inline-block">
                   <i class="nav-icon fas fa-cog"></i>
                 </span>
+                <span class="nav-link-title">Layanan</span>
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item {{request()->routeIs('pakets')?'active':''}}" href="{{route('pakets')}}">
+                  Paket
+                </a>
+                <a class="dropdown-item {{request()->routeIs('mitras.index')?'active':''}}" href="{{route('mitras.index')}}">
+                  Mitra
+                </a>
+                <a class="dropdown-item {{request()->routeIs('suppliers')?'active':''}}" href="{{route('suppliers')}}">
+                  Supplier
+                </a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#navbar-help" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
+                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                  <i class="nav-icon fas fa-cog"></i>
+                </span>
+                <span class="nav-link-title">Pengeluaran</span>
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item {{request()->routeIs('pengeluaranbulanans')?'active':''}}" href="{{route('pengeluaranbulanans')}}">
+                  Pengeluaran
+                </a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#navbar-help" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
+                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                  <i class="nav-icon fas fa-cog"></i>
+                </span>
                 <span class="nav-link-title">Master</span>
               </a>
               <div class="dropdown-menu">
-                <a class="dropdown-item {{request()->routeIs('kelasnyas')?'active':''}}" href="{{route('kelasnyas')}}">
-                  Kelas
+                <a class="dropdown-item {{request()->routeIs('users')?'active':''}}" href="{{route('users')}}">
+                  User
                 </a>
-                <a class="dropdown-item {{request()->routeIs('kelompoks')?'active':''}}" href="{{route('kelompoks')}}">
-                  Kelompok
+                <a class="dropdown-item {{request()->routeIs('agents')?'active':''}}" href="{{route('agents')}}">
+                  Agent
                 </a>
-                <a class="dropdown-item {{request()->routeIs('ustadzs')?'active':''}}" href="{{route('ustadzs')}}">
-                  Ustadz
+                <a class="dropdown-item {{request()->routeIs('maskapais')?'active':''}}" href="{{route('maskapais')}}">
+                  Maskapai
                 </a>
-                <a class="dropdown-item {{request()->routeIs('santris')?'active':''}}" href="{{route('santris')}}">
-                  Santri
+                <a class="dropdown-item {{request()->routeIs('hotels')?'active':''}}" href="{{route('hotels')}}">
+                  Hotel
                 </a>
+
               </div>
             </li>
           </ul>

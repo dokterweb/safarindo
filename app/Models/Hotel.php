@@ -6,14 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Kelasnya extends Model
+class Hotel extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable=['nama_kelas'];
-
-    public function santris()
-    {
-        return $this->hasMany(Santri::class);
-    }
-
+    protected $fillable=['nama_hotel', 'lokasi_hotel', 'kontak_hotel', 'email_hotel', 'rating_hotel', 'harga_hotel', 'catatan_hotel'];
+    
 }

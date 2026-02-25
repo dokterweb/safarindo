@@ -7,147 +7,54 @@
     <div class="page-body">
       <div class="container-xl">
         <div class="row row-cards">
-          <div class="col-lg-12">
-            <form action="{{ route('santris.store') }}" method="POST" enctype="multipart/form-data" class="card">
-              @csrf
-              <div class="card-header bg-red-lt">
-                <h3 class="card-title">Input Data</h3>
-              </div>
-              <div class="card-body">
-                  <div class="row">
-                      <div class="col-md-3 mb-3">
-                          <div class="form-group">
-                              <label>Nama Santri</label>
-                              <input type="text" name="name" class="form-control" value="{{ old('name') }}">
-                              @error('name')
-                                  <span class="text-danger">{{ $message }}</span>
-                              @enderror
-                          </div>
-                      </div>
-                      <div class="col-md-3 mb-3">
-                        <div class="form-group">
-                            <label>Kelas</label>
-                            <select class="form-select" name="kelas_id">
-                                <option value="">Pilih Kelas</option>
-                                @foreach ($kelasnyas as $p)
-                                <option value="{{ $p->id }}" {{ old('kelas_id') == $p->id ? 'selected' : '' }}>{{ $p->nama_kelas }}</option>
-                                @endforeach
-                            </select>
-                            @error('kelas_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-                      <div class="col-md-3 mb-3">
-                          <div class="form-group">
-                              <label>Kelompok</label>
-                              <select class="form-select" name="kelompok_id">
-                                  <option value="">Pilih kelompok</option>
-                                  @foreach ($kelompoks as $p)
-                                  <option value="{{ $p->id }}" {{ old('kelompok_id') == $p->id ? 'selected' : '' }}>{{ $p->nama_kelompok }}</option>
-                                  @endforeach
-                              </select>
-                              @error('kelompok_id')
-                                  <span class="text-danger">{{ $message }}</span>
-                              @enderror
-                          </div>
-                      </div>
-                      <div class="col-md-3 mb-3">
-                          <div class="form-group">
-                              <label>Kelamin</label>
-                              <select name="kelamin" class="form-select">
-                                  <option value="laki-laki" {{ old('kelamin') == 'laki-laki' ? 'selected' : '' }}>laki-laki</option>
-                                  <option value="perempuan" {{ old('kelamin') == 'perempuan' ? 'selected' : '' }}>perempuan</option>
-                              </select>
-                              @error('kelamin')
-                                  <span class="text-danger">{{ $message }}</span>
-                              @enderror
-                          </div>
-                      </div>
-                      <div class="col-md-4 mb-3">
-                          <div class="form-group">
-                              <label >Email</label>
-                              <input type="text" name="email" class="form-control" value="{{ old('email') }}">
-                              @error('email')
-                                  <span class="text-danger">{{ $message }}</span>
-                              @enderror
-                          </div>
-                      </div>
-                      <div class="col-md-4 mb-3">
-                          <div class="form-group">
-                              <label >Password</label>
-                              <input type="password" name="password" class="form-control">
-                              @error('password')
-                                  <span class="text-danger">{{ $message }}</span>
-                              @enderror
-                          </div>
-                      </div>
-                      <div class="col-md-4 mb-3">
-                        <div class="form-group">
-                          <label for="avatar">Avatar</label>
-                          <input type="file" class="form-control" name="avatar" accept="image/*">
-                        </div>
-                    </div>
-                  </div>
-              </div>
-              <!-- /.card-body -->
-              <div class="card-footer">
-                  <button type="submit" class="btn btn-primary">Submit</button>
-              </div>
-          </form>
-          </div>
-
-          <div class="col-lg-12">
-            <div class="card">
-              <div class="card-header bg-cyan-lt">
-                <h3 class="card-title">Data Santri</h3>
-              </div>
-              <div class="table-responsive p-3">
-                <table id="mytable" class="table table-vcenter card-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Nama Santri</th>
-                      <th>Kelas</th>
-                      <th>Kelompok</th>
-                      <th>Kelamin</th>
-                      <th>Email</th>
-                      <th class="w-1">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @forelse ($santris as $p)
+            <div class="col-lg-12">
+                <div class="card">
+                <div class="card-header bg-cyan-lt">
+                    <h3 class="card-title">Data Agent</h3>
+                </div>
+                <div class="table-responsive p-3">
+                    <table id="mytable" class="table table-vcenter card-table">
+                    <thead>
                         <tr>
-                            <td>{{$loop->iteration}}</td>
-                            <td>{{$p->user->name}} </td>
-                            <td>{{$p->kelasnya->nama_kelas}} </td>
-                            <td>{{$p->kelompok->nama_kelompok}} </td>
-                            <td>{{$p->kelamin}} </td>
-                            <td>{{$p->user->email}} </td>
-                            <td class="d-flex align-items-center" style="gap: 5px;">
-                                <button type="button" class="btn btn-sm btn-primary" 
-                                        data-bs-toggle="modal" data-bs-target="#modalnya" 
-                                        onclick="showSantriDetails({{ $p->id }})">
-                                    Show
-                                </button>
-                                <a href="{{route('santris.edit',$p->id)}}" class="btn btn-sm btn-info">Edit</a>
-                                <form method="POST" action="{{ route('santris.destroy', $p->id) }}" style="display: inline;" id="delete-form-{{ $p->id }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $p->id }})">Del</button>
-                                </form>
-                            </td>
+                        <th>#</th>
+                        <th>Nama Agent</th>
+                        <th>Email</th>
+                        <th>Kelamin</th>
+                        <th>No HP</th>
+                        <th>Umur</th>
+                        <th>Kota</th>
+                        <th class="w-1">Action</th>
                         </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6">No Data</td>
-                    </tr>
-                    @endforelse
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                        @forelse ($agents as $p)
+                            <tr>
+                                <td>{{$loop->iteration}}</td>
+                                <td>{{$p->user->name}} </td>
+                                <td>{{$p->user->email}} </td>
+                                <td>{{$p->kelamin}} </td>
+                                <td>{{$p->no_hp}} </td>
+                                <td>{{$p->tanggal_lahir}} </td>
+                                <td>{{$p->kota}} </td>
+                                <td class="d-flex align-items-center" style="gap: 5px;">
+                                   {{-- <a href="{{route('santris.edit',$p->id)}}" class="btn btn-sm btn-info">Edit</a>
+                                    <form method="POST" action="{{ route('santris.destroy', $p->id) }}" style="display: inline;" id="delete-form-{{ $p->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $p->id }})">Del</button>
+                                    </form> --}}
+                                </td>
+                            </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6">No Data</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                    </table>
+                </div>
+                </div>
             </div>
-          </div>
         </div>
       </div>
     </div>

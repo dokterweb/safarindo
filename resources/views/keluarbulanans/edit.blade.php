@@ -19,7 +19,7 @@
       <div class="container-xl">
         <div class="row row-cards">
           <div class="col-lg-4">
-            <form class="card" method="POST" action="{{route('kelasnyas.update',$kelasnya->id)}}">
+            <form class="card" method="POST" action="{{route('keluarbulanans.update',$keluarbulanan->id)}}">
               @csrf
               @method('PUT')
               <div class="card-header">
@@ -27,8 +27,8 @@
               </div>
               <div class="card-body">
                 <div class="mb-3">
-                  <label class="form-label">Nama Kelas</label>
-                  <input type="text" name="nama_kelas" class="form-control" value="{{$kelasnya->nama_kelas}}">
+                  <label class="form-label">Nama Pengeluaran Bulanan</label>
+                  <input type="text" name="nama_pengeluaran" class="form-control" value="{{$keluarbulanan->nama_pengeluaran}}">
                 </div>
               </div>
               <div class="card-footer text-end">
@@ -47,24 +47,24 @@
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Nama Kelas</th>
+                      <th>Nama Pengeluaran</th>
                       <th class="w-1">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @forelse ($kelasview as $p)
+                    @forelse ($keluarbulananview as $k)
                             <tr>
                                 <td>{{$loop->iteration}}</td>
-                                <td>{{$p->nama_kelas}} </td>
+                                <td>{{$k->nama_maskapai}} </td>
                                 <td class="d-flex align-items-center" style="gap: 5px;">
-                                  <a href="{{route('kelasnyas.edit',$p->id)}}" class="btn btn-sm btn-info"><i class="far fa-edit"></i>Edit</a>
-                                    <form method="POST" action="{{ route('kelasnyas.destroy', $p->id) }}" style="display: inline;" id="delete-form-{{ $p->id }}">
+                                  <a href="{{route('pengeluaranbulanans.edit',$k->id)}}" class="btn btn-sm btn-info"><i class="far fa-edit"></i>Edit</a>
+                                    {{-- <form method="POST" action="{{ route('maskapais.destroy', $m->id) }}" style="display: inline;" id="delete-form-{{ $m->id }}">
                                       @csrf
                                       @method('DELETE')
-                                      <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $p->id }})">
+                                      <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $m->id }})">
                                           <i class="fas fa-trash-alt"></i> Hapus
                                       </button>
-                                    </form>
+                                    </form> --}}
                                     
                                 </td>
                             </tr>

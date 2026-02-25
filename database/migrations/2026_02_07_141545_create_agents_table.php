@@ -11,14 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('santris', function (Blueprint $table) {
+        Schema::create('agents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->unsignedInteger('kelas_id');
-            $table->foreign('kelas_id')->references('id')->on('kelasnyas')->onDelete('cascade');
-            $table->unsignedInteger('kelompok_id');
-            $table->foreign('kelompok_id')->references('id')->on('kelompoks')->onDelete('cascade');
+            $table->string('nik');
+            $table->string('no_hp');
+            $table->string('kota');
             $table->enum('kelamin', ['laki-laki', 'perempuan']);
+            $table->string('tempat_lahir');
+            $table->date('tanggal_lahir');
+            $table->enum('status', ['active', 'non_active']);
+            $table->string('alamat');
+            $table->string('catatan');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -29,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('santris');
+        Schema::dropIfExists('agents');
     }
 };
