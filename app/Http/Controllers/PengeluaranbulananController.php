@@ -32,4 +32,49 @@ class PengeluaranbulananController extends Controller
                              ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    public function edit(Pengeluaranbulanan $pengeluaranbulanan)
+    {
+        $keluarbulananview = Pengeluaranbulanan::all();
+        // dd($Maskapai);
+        return view('keluarbulanans.edit',compact('pengeluaranbulanan','keluarbulananview'));
+    }
+
+    public function update(Request $request, Pengeluaranbulanan $pengeluaranbulanan)
+    {
+        $request->validate([
+            'nama_pengeluaran'         => 'required|string|max:255',
+        ]);
+
+        try {
+            $pengeluaranbulanan->update([
+                'nama_pengeluaran'         => $request->nama_pengeluaran,
+            ]);
+
+            return redirect()
+                ->route('pengeluaranbulanans')
+                ->with('success', 'Data maskapai berhasil diperbarui.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            // Temukan maskapai berdasarkan ID
+            $pengeluaranbulanan = Pengeluaranbulanan::findOrFail($id);
+            
+            // Hapus data
+            $pengeluaranbulanan->delete();
+
+            // Redirect dengan notifikasi sukses
+            return redirect()->route('pengeluaranbulanans')
+                            ->with('success', 'Data maskapai berhasil dihapus.');
+        } catch (\Exception $e) {
+            // Jika terjadi kesalahan
+            return redirect()->route('pengeluaranbulanans')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 }

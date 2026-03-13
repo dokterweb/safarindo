@@ -101,6 +101,9 @@
                 <a class="dropdown-item {{request()->routeIs('pengeluaranbulanans')?'active':''}}" href="{{route('pengeluaranbulanans')}}">
                   Pengeluaran
                 </a>
+                <a class="dropdown-item {{request()->routeIs('pengeluaranbulanantrxs')?'active':''}}" href="{{route('pengeluaranbulanantrxs')}}">
+                  Transaksi
+                </a>
               </div>
             </li>
             <li class="nav-item dropdown">

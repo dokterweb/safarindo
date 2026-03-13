@@ -2,33 +2,40 @@
 
 @section('content')
 <div class="page-wrapper">
-    <!-- Page header -->
-    <div class="page-header d-print-none">
-      <div class="container-xl">
-        <div class="row g-2 align-items-center">
-          <div class="col">
-            <h2 class="page-title">
-              Pengeluaran
-            </h2>
-          </div>
-        </div>
-      </div>
-    </div>
+   
     <!-- Page body -->
     <div class="page-body">
       <div class="container-xl">
         <div class="row row-cards">
           <div class="col-lg-4">
-            <form class="card" method="POST" action="{{route('pengeluaranbulanans.update',$pengeluaranbulanan->id)}}">
+            <form class="card" method="POST" action="{{route('pengeluaranbulanantrxs.update',$pengeluaranbulanantrx->id)}}">
               @csrf
               @method('PUT')
-              <div class="card-header">
+              <div class="card-header bg-red-lt">
                 <h3 class="card-title">Edit Data</h3>
               </div>
               <div class="card-body">
                 <div class="mb-3">
-                  <label class="form-label">Nama Pengeluaran Bulanan</label>
-                  <input type="text" name="nama_pengeluaran" class="form-control" value="{{$pengeluaranbulanan->nama_pengeluaran}}">
+                  <select name="pengeluaran_id" id="pengeluaran_id" class="form-select" required>
+                    <option value="">Pilih Pengeluaran</option>
+                    @foreach ($databulanan as $p)
+                    <option value="{{ $p->id }}" {{ $pengeluaranbulanantrx->pengeluaran_id == $p->id ? 'selected' : '' }}>{{ $p->nama_pengeluaran }}</option>
+                    @endforeach
+                  </select>   
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Jumlah</label>
+                  <input type="number" name="jumlah" class="form-control" value="{{ $pengeluaranbulanantrx->jumlah }}">
+                  @error('jumlah')
+                      <span class="text-danger">{{ $message }}</span>
+                  @enderror
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">keterangan</label>
+                  <input type="text" name="keterangan" class="form-control" value="{{ $pengeluaranbulanantrx->keterangan }}">
+                  @error('keterangan')
+                      <span class="text-danger">{{ $message }}</span>
+                  @enderror
                 </div>
               </div>
               <div class="card-footer text-end">
@@ -39,8 +46,8 @@
 
           <div class="col-lg-8">
             <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">Data Kelas</h3>
+              <div class="card-header bg-blue-lt">
+                <h3 class="card-title">Daa Pengeluaran</h3>
               </div>
               <div class="table-responsive">
                 <table id="mytable" class="table table-vcenter card-table">
@@ -48,29 +55,32 @@
                     <tr>
                       <th>#</th>
                       <th>Nama Pengeluaran</th>
+                      <th>Jumlah </th>
+                      <th>Keterangan</th>
                       <th class="w-1">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @forelse ($keluarbulananview as $k)
+                    @forelse ($keluarbulanantrxs as $m)
                             <tr>
                                 <td>{{$loop->iteration}}</td>
-                                <td>{{$k->nama_pengeluaran}} </td>
-                                <td class="d-flex align-items-center" style="gap: 5px;">
-                                  <a href="{{route('pengeluaranbulanans.edit',$k->id)}}" class="btn btn-sm btn-info"><i class="far fa-edit"></i>Edit</a>
-                                    <form method="POST" action="{{ route('pengeluaranbulanans.destroy', $k->id) }}" style="display: inline;" id="delete-form-{{ $k->id }}">
-                                      @csrf
-                                      @method('DELETE')
-                                      <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $k->id }})">
-                                          <i class="fas fa-trash-alt"></i> Hapus
-                                      </button>
-                                    </form>
-                                    
+                                <td>{{$m->nama_pengeluaran}} </td>
+                                <td>{{$m->jumlah}} </td>
+                                <td>{{$m->keterangan}} </td>
+                                <td class="d-flex align-items-center">
+                                  {{-- <a href="{{route('maskapais.edit',$m->id)}}" class="btn btn-sm btn-info"><i class="far fa-edit"></i></a>
+                                  <form method="POST" action="{{ route('maskapais.destroy', $m->id) }}" id="delete-form-{{ $m->id }}"> 
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $m->id }})">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                  </form> --}}
                                 </td>
                             </tr>
                         @empty
                         <tr>
-                            <td colspan="3">No Data</td>
+                            <td colspan="6">No Data</td>
                         </tr>
                         @endforelse
                   </tbody>
@@ -84,7 +94,6 @@
     
 </div>
 @endsection
-
 
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

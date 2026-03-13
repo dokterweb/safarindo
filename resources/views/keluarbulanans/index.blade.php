@@ -2,7 +2,18 @@
 
 @section('content')
 <div class="page-wrapper">
-   
+   <!-- Page header -->
+   <div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col">
+          <h2 class="page-title">
+            Pengeluaran
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
     <!-- Page body -->
     <div class="page-body">
       <div class="container-xl">
@@ -15,7 +26,7 @@
               </div>
               <div class="card-body">
                 <div class="mb-3">
-                  <label class="form-label">Nama Maskapai</label>
+                  <label class="form-label">Nama Pengeluaran</label>
                   <input type="text" name="nama_pengeluaran" class="form-control" value="{{ old('nama_pengeluaran') }}">
                   @error('nama_pengeluaran')
                       <span class="text-danger">{{ $message }}</span>
@@ -48,14 +59,14 @@
                         <td>{{$loop->iteration}}</td>
                         <td>{{$k->nama_pengeluaran}}</td>
                         <td class="d-flex align-items-center">
-                          <a href="{{route('pengeluaranbulanans.edit',$k->id)}}" class="btn btn-sm btn-info"><i class="far fa-edit"></i></a>
-                          {{-- <form method="POST" action="{{ route('maskapais.destroy', $m->id) }}" id="delete-form-{{ $m->id }}"> 
+                          <a href="{{route('pengeluaranbulanans.edit',$k->id)}}" class="btn btn-sm btn-info"><i class="far fa-edit"></i>Edit</a>
+                          <form method="POST" action="{{ route('pengeluaranbulanans.destroy', $k->id) }}" id="delete-form-{{ $k->id }}"> 
                             @csrf
                             @method('DELETE')
-                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $m->id }})">
-                                <i class="fas fa-trash-alt"></i>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $k->id }})">
+                              <i class="fas fa-trash-alt"></i> Hapus
                             </button>
-                          </form> --}}
+                          </form>
                         </td>
                       </tr>
                     @empty

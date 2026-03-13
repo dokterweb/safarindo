@@ -10,4 +10,10 @@ class Pengeluaranbulanan extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable=['nama_pengeluaran'];
+
+    public function pengeluaranbulanantrxs()
+    {
+        return $this->hasMany(Pengeluaranbulanantrx::class, 'pengeluaran_id');
+    }
+
 }

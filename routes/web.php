@@ -8,6 +8,7 @@ use App\Http\Controllers\MaskapaiController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\PaketController;
 use App\Http\Controllers\PengeluaranbulananController;
+use App\Http\Controllers\PengeluaranbulanantrxController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -74,4 +75,12 @@ Route::get('/pengeluaranbulanans',[PengeluaranbulananController::class, 'index']
 Route::post('pengeluaranbulanans/store', [PengeluaranbulananController::class, 'store'])->middleware('role:admin')->name('pengeluaranbulanans.store');
 Route::get('pengeluaranbulanans/{pengeluaranbulanan}/edit', [PengeluaranbulananController::class, 'edit'])->middleware('role:admin')->name('pengeluaranbulanans.edit');
 Route::put('pengeluaranbulanans/{pengeluaranbulanan}', [PengeluaranbulananController::class, 'update'])->middleware('role:admin')->name('pengeluaranbulanans.update');
+Route::delete('pengeluaranbulanans/{pengeluaranbulanan}', [PengeluaranbulananController::class, 'destroy'])->middleware('role:admin')->name('pengeluaranbulanans.destroy');
 
+Route::get('/pengeluaranbulanantrxs',[PengeluaranbulanantrxController::class, 'index'])->middleware('role:admin')->name('pengeluaranbulanantrxs');
+Route::post('pengeluaranbulanantrxs/store', [PengeluaranbulanantrxController::class, 'store'])->middleware('role:admin')->name('pengeluaranbulanantrxs.store');
+Route::get('pengeluaranbulanantrxs/{pengeluaranbulanantrx}/edit', [PengeluaranbulanantrxController::class, 'edit'])->middleware('role:admin')->name('pengeluaranbulanantrxs.edit');
+Route::put('pengeluaranbulanantrxs/{id}', [PengeluaranbulanantrxController::class, 'update'])
+    ->name('pengeluaranbulanantrxs.update');
+Route::delete('pengeluaranbulanantrxs/{id}', [PengeluaranbulanantrxController::class, 'destroy'])
+    ->name('pengeluaranbulanantrxs.destroy');
