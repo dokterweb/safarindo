@@ -49,13 +49,4 @@ class User extends Authenticatable
         ];
     }
 
-    public function ustadz()
-    {
-        return $this->hasOne(Ustadz::class, 'user_id', 'id');
-    }
-
-    public function santri()
-    {
-        return $this->hasOne(Santri::class, 'user_id', 'id');
-    }
 }
