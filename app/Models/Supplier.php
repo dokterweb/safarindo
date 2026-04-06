@@ -10,4 +10,9 @@ class Supplier extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable=['nama_supplier', 'no_hp', 'email', 'kota', 'alamat', 'catatan'];
+
+    public function pembelians()
+    {
+        return $this->hasMany(Pembelian::class);
+    }
 }

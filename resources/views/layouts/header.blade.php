@@ -88,6 +88,18 @@
                 <a class="dropdown-item {{request()->routeIs('suppliers')?'active':''}}" href="{{route('suppliers')}}">
                   Supplier
                 </a>
+                <a class="dropdown-item {{request()->routeIs('pakets.jamaah')?'active':''}}" href="{{route('pakets.jamaah')}}">
+                  Jamaah
+                </a>
+                <a class="dropdown-item {{request()->routeIs('pakets.pembayaran')?'active':''}}" href="{{route('pakets.pembayaran')}}">
+                  Pembayaran
+                </a>
+                <a class="dropdown-item {{request()->routeIs('diskons')?'active':''}}" href="{{route('diskons')}}">
+                  Diskon
+                </a>
+                <a class="dropdown-item {{request()->routeIs('keluarproduks')?'active':''}}" href="{{route('keluarproduks')}}">
+                  Penjualan
+                </a>
               </div>
             </li>
             <li class="nav-item dropdown">
@@ -103,6 +115,9 @@
                 </a>
                 <a class="dropdown-item {{request()->routeIs('pengeluaranbulanantrxs')?'active':''}}" href="{{route('pengeluaranbulanantrxs')}}">
                   Transaksi
+                </a>
+                <a class="dropdown-item {{request()->routeIs('pembelians')?'active':''}}" href="{{route('pembelians')}}">
+                  Pembelian
                 </a>
               </div>
             </li>
@@ -125,6 +140,12 @@
                 </a>
                 <a class="dropdown-item {{request()->routeIs('hotels')?'active':''}}" href="{{route('hotels')}}">
                   Hotel
+                </a>
+                <a class="dropdown-item {{request()->routeIs('units')?'active':''}}" href="{{route('units')}}">
+                  Unit
+                </a>
+                <a class="dropdown-item {{request()->routeIs('produks')?'active':''}}" href="{{route('produks')}}">
+                  Produk
                 </a>
 
               </div>

@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pembayarans', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('jumlah_bayar');
-            $table->string('bukti_bayar')->nullable();
-            $table->string('metode_bayar');
+        Schema::create('diskons', function (Blueprint $table) {
+            $table->increments('id');
             $table->unsignedInteger('paket_id'); 
             $table->foreign('paket_id')->references('id')->on('pakets')->onDelete('cascade');
-            $table->foreign('jamaah_id')->references('id')->on('jamaahs')->onDelete('cascade');
+            $table->foreign('jamaah_id')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->enum('status', ['0', '1'])->default('0');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pembayarans');
+        Schema::dropIfExists('diskons');
     }
 };

@@ -3,13 +3,20 @@
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiskonController;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\JamaahController;
+use App\Http\Controllers\KeluarprodukController;
 use App\Http\Controllers\MaskapaiController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\PaketController;
+use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PengeluaranbulananController;
 use App\Http\Controllers\PengeluaranbulanantrxController;
+use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +77,10 @@ Route::post('pakets/store', [PaketController::class, 'store'])->middleware('role
 Route::get('pakets/{paket}/edit', [PaketController::class, 'edit'])->middleware('role:admin')->name('pakets.edit');
 Route::put('pakets/{paket}', [PaketController::class, 'update'])->middleware('role:admin')->name('pakets.update');
 Route::delete('pakets/{paket}', [PaketController::class, 'destroy'])->middleware('role:admin')->name('pakets.destroy');
+Route::get('/pakets/jamaah',[PaketController::class, 'indexjamaah'])->middleware('role:admin')->name('pakets.jamaah');
+Route::get('/pakets/{id}/jamaah', [PaketController::class, 'byPaket'])->middleware('role:admin')->name('pakets.jamaah.detail');
+Route::get('/pakets/pembayaran',[PaketController::class, 'indexpembayaran'])->middleware('role:admin')->name('pakets.pembayaran');
+Route::get('/pakets/{id}/pembayaran', [PaketController::class, 'detailPembayaran'])->middleware('role:admin')->name('pakets.pembayaran.detail');
 
 Route::get('/pengeluaranbulanans',[PengeluaranbulananController::class, 'index'])->middleware('role:admin')->name('pengeluaranbulanans');
 Route::post('pengeluaranbulanans/store', [PengeluaranbulananController::class, 'store'])->middleware('role:admin')->name('pengeluaranbulanans.store');
@@ -84,3 +95,48 @@ Route::put('pengeluaranbulanantrxs/{id}', [PengeluaranbulanantrxController::clas
     ->name('pengeluaranbulanantrxs.update');
 Route::delete('pengeluaranbulanantrxs/{id}', [PengeluaranbulanantrxController::class, 'destroy'])
     ->name('pengeluaranbulanantrxs.destroy');
+    
+Route::get('/pakets/{id}/jamaah/create', [JamaahController::class, 'createByPaket'])->middleware('role:admin')->name('pakets.jamaah.create');
+Route::post('/pakets/{id}/jamaah/store', [JamaahController::class, 'storeByPaket'])->middleware('role:admin')->name('pakets.jamaah.store');
+Route::get('/jamaahs/{id}', [JamaahController::class, 'show'])->middleware('role:admin')->name('jamaahs.show');
+Route::get('/jamaahs/{id}/edit', [JamaahController::class, 'edit'])->middleware('role:admin')->name('jamaahs.edit');
+Route::put('/jamaahs/{id}', [JamaahController::class, 'update'])->middleware('role:admin')->name('jamaahs.update');
+
+// Route::get('/pembayarans/{id}', [PembayaranController::class, 'detail'])->middleware('role:admin')->name('pembayarans.detail');
+
+Route::get('/pembayarans/{jamaah}', [PembayaranController::class, 'detail'])->middleware('role:admin')->name('pembayarans.detail');
+Route::post('/pembayarans/{jamaah}/store', [PembayaranController::class, 'store'])->middleware('role:admin')->name('pembayarans.store');
+Route::put('/pembayarans/{pembayaran}/update', [PembayaranController::class, 'update'])
+    ->name('pembayarans.update');
+
+Route::get('/diskons',[DiskonController::class, 'index'])->middleware('role:admin')->name('diskons');
+Route::post('/diskons/{jamaah}', [DiskonController::class, 'store'])->name('diskons.store');
+Route::post('/diskons/{id}/approve', [DiskonController::class, 'approve'])->middleware('role:admin')->name('diskons.approve');
+
+Route::get('/units',[UnitController::class, 'index'])->middleware('role:admin')->name('units');
+Route::post('units/store', [UnitController::class, 'store'])->middleware('role:admin')->name('units.store');
+Route::get('units/{unit}/edit', [UnitController::class, 'edit'])->middleware('role:admin')->name('units.edit');
+Route::put('units/{unit}', [UnitController::class, 'update'])->middleware('role:admin')->name('units.update');
+Route::delete('units/{unit}', [UnitController::class, 'destroy'])->middleware('role:admin')->name('units.destroy');
+
+Route::get('/produks',[ProdukController::class, 'index'])->middleware('role:admin')->name('produks');
+Route::get('/produks/create',[ProdukController::class, 'create'])->middleware('role:admin')->name('produks.create');
+Route::post('produks/store', [ProdukController::class, 'store'])->middleware('role:admin')->name('produks.store');
+Route::get('produks/{id}/edit', [ProdukController::class, 'edit'])->middleware('role:admin')->name('produks.edit');
+Route::put('produks/{id}', [ProdukController::class, 'update'])->middleware('role:admin')->name('produks.update');
+Route::delete('produks/{id}', [ProdukController::class, 'destroy'])->middleware('role:admin')->name('produks.destroy');
+Route::get('/produk/search', [ProdukController::class, 'search'])->name('produk.search');
+
+Route::get('/pembelians', [PembelianController::class, 'index'])->name('pembelians');
+Route::get('/pembelians/create', [PembelianController::class, 'create'])->name('pembelians.create');
+Route::post('/pembelians', [PembelianController::class, 'store'])->name('pembelians.store');
+Route::get('/pembelians/{id}', [PembelianController::class, 'show'])->name('pembelians.show');
+Route::get('/pembelians/{id}/edit', [PembelianController::class, 'edit'])->name('pembelians.edit');
+Route::put('/pembelians/{id}', [PembelianController::class, 'update'])->name('pembelians.update');
+
+Route::get('/keluarproduks', [KeluarprodukController::class, 'index'])->name('keluarproduks');
+Route::get('/keluarproduks/create', [KeluarprodukController::class, 'create'])->name('keluarproduks.create');
+Route::post('/keluarproduks', [KeluarprodukController::class, 'store'])->name('keluarproduks.store');
+Route::get('/keluarproduks/{id}', [KeluarprodukController::class, 'show'])->name('keluarproduks.show');
+Route::get('/keluarproduks/{id}/edit', [KeluarprodukController::class, 'edit'])->name('keluarproduks.edit');
+Route::put('/keluarproduks/{id}', [KeluarprodukController::class, 'update'])->name('keluarproduks.update');

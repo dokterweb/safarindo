@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pembayarans', function (Blueprint $table) {
+        Schema::create('pembelians', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('jumlah_bayar');
-            $table->string('bukti_bayar')->nullable();
-            $table->string('metode_bayar');
+            $table->unsignedInteger('supplier_id'); 
+            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
             $table->unsignedInteger('paket_id'); 
             $table->foreign('paket_id')->references('id')->on('pakets')->onDelete('cascade');
-            $table->foreign('jamaah_id')->references('id')->on('jamaahs')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->date('tanggal');
+            $table->integer('tax'); 
+            $table->integer('diskon'); 
+            $table->integer('shipping'); 
+            $table->bigInteger('grand_total'); 
+            $table->string('catatan')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -30,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pembayarans');
+        Schema::dropIfExists('pembelians');
     }
 };

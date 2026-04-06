@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('nama_jamaah_pasport');
             $table->string('no_pasport');
             $table->string('penerbit');
-            $table->string('pasport_aktif');
-            $table->string('pasport_expired');
+            $table->date('pasport_aktif');
+            $table->date('pasport_expired');
             $table->string('foto_jamaah')->nullable();
             $table->string('foto_ktp')->nullable();
             $table->string('foto_kk')->nullable();

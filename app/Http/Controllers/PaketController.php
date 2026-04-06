@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller; 
 use App\Http\Requests\PaketStoreRequest;
 use App\Http\Requests\UpdateStoreRequest;
+use App\Models\Jamaah;
 use App\Models\Maskapai;
 use App\Models\Paket;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,6 +19,16 @@ class PaketController extends Controller
         $pakets = Paket::all();
         return view('pakets.index',compact('pakets'));
     }
+
+
+  /*   public function indexpembayaran()
+    {
+        $jamaahs = Jamaah::with('paket')
+            ->withSum('pembayarans as total_bayar', 'jumlah_bayar')
+            ->get();
+    
+        return view('pembayarans.index', compact('jamaahs'));
+    } */
 
     public function create()
     {
@@ -148,5 +159,35 @@ class PaketController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    
+    public function indexjamaah()
+    {
+        $pakets = Paket::withCount('jamaahs')->get();
+        return view('jamaahs.index', compact('pakets'));
+    }
+
+    public function indexpembayaran()
+    {
+        $pakets = Paket::withCount('jamaahs')->get();
+
+        return view('pembayarans.index', compact('pakets'));
+    }
+
+    public function byPaket($id)
+    {
+        $paket = Paket::with('jamaahs')->findOrFail($id);
+        return view('jamaahs.by_paket', compact('paket'));
+    }
+
+    public function detailPembayaran($id)
+    {
+        $paket = Paket::with([
+            'jamaahs' => function ($q) {
+                $q->withSum('pembayarans as total_bayar', 'jumlah_bayar');
+            }
+        ])->findOrFail($id);
+        return view('pembayarans.by_paket', compact('paket'));
     }
 }

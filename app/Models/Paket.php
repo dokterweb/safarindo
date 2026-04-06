@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Hotel;
+use App\Models\Maskapai;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Paket extends Model
 {
@@ -31,5 +33,13 @@ class Paket extends Model
         return $this->belongsTo(Hotel::class, 'hotel_transit_id');
     }
 
+    public function jamaahs()
+    {
+        return $this->hasMany(Jamaah::class);
+    }
 
+    public function keluarproduks()
+    {
+        return $this->hasMany(Keluarproduk::class);
+    }
 }
