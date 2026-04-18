@@ -1,15 +1,19 @@
 <?php
 
+use App\Http\Controllers\AgenDashboardController;
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\AgentTransaksiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiskonController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\JamaahController;
 use App\Http\Controllers\KeluarprodukController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MaskapaiController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\PaketController;
+use App\Http\Controllers\PembatalanController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PengeluaranbulananController;
@@ -38,7 +42,7 @@ Route::middleware(['auth', 'role:management'])->get('/management/dashboard', [Da
 Route::middleware(['auth', 'role:staff'])->get('/staff/dashboard', [DashboardController::class, 'indexstaff'])->name('staff.dashboard');
 
 // Route untuk agen
-Route::middleware(['auth', 'role:agen'])->get('/agen/dashboard', [DashboardController::class, 'indexagen'])->name('agen.dashboard');
+/* Route::middleware(['auth', 'role:agen'])->get('/agen/dashboard', [DashboardController::class, 'indexagen'])->name('agen.dashboard'); */
 
 Route::get('/users',[UserController::class, 'index'])->middleware('role:admin')->name('users');
 Route::post('users/store', [UserController::class, 'store'])->middleware('role:admin')->name('users.store');
@@ -53,6 +57,10 @@ Route::get('agents/{agent}/edit', [AgentController::class, 'edit'])->middleware(
 Route::put('agents/{agent}', [AgentController::class, 'update'])->middleware('role:admin')->name('agents.update');
 Route::delete('agents/{agent}', [AgentController::class, 'destroy'])->middleware('role:admin')->name('agents.destroy');
 
+Route::get('/agent_transaksis',[AgentTransaksiController::class, 'index'])->middleware('role:admin')->name('agent_transaksis');
+Route::get('/agent/{agent}/jamaah', [AgentTransaksiController::class, 'jamaah'])->middleware('role:admin')->name('agent_transaksis.jamaah');
+Route::post('/agent-transaksis/bayar', [AgentTransaksiController::class, 'bayarFee'])->middleware('role:admin')->name('agent_transaksis.bayar');
+    
 Route::get('/maskapais',[MaskapaiController::class, 'index'])->middleware('role:admin')->name('maskapais');
 Route::post('maskapais/store', [MaskapaiController::class, 'store'])->middleware('role:admin')->name('maskapais.store');
 Route::get('maskapais/{maskapai}/edit', [MaskapaiController::class, 'edit'])->middleware('role:admin')->name('maskapais.edit');
@@ -140,3 +148,23 @@ Route::post('/keluarproduks', [KeluarprodukController::class, 'store'])->name('k
 Route::get('/keluarproduks/{id}', [KeluarprodukController::class, 'show'])->name('keluarproduks.show');
 Route::get('/keluarproduks/{id}/edit', [KeluarprodukController::class, 'edit'])->name('keluarproduks.edit');
 Route::put('/keluarproduks/{id}', [KeluarprodukController::class, 'update'])->name('keluarproduks.update');
+
+Route::get('/pakets/pembatalan',[PaketController::class, 'indexpembatalan'])->middleware('role:admin')->name('pakets.pembatalan');
+Route::get('/pakets/{id}/pembatalan', [PaketController::class, 'detailpembatalan'])->middleware('role:admin')->name('pakets.pembatalan.detail');
+Route::get('/pembatalans', [PembatalanController::class, 'indexsetuju'])->middleware('role:admin')->name('pembatalans');
+Route::post('/pembatalans/store', [PembatalanController::class, 'store'])->middleware('role:admin')->name('pembatalans.store');
+Route::post('/pembatalans/{id}/approve', [PembatalanController::class, 'approve'])->middleware('role:admin')->name('pembatalans.approve');
+Route::prefix('pembatalans')->middleware('role:admin')->group(function () {
+    Route::get('/{id}', [PembatalanController::class, 'show'])->name('pembatalans.show');
+    Route::post('/{id}/approve', [PembatalanController::class, 'approve'])->name('pembatalans.approve');
+    Route::post('/{id}/reject', [PembatalanController::class, 'reject'])->name('pembatalans.reject');
+});
+
+Route::get('/laporan/neraca', [LaporanController::class, 'neraca'])->middleware('role:admin')->name('laporan.neraca');
+    
+Route::middleware(['auth', 'role:agen'])->group(function () {
+    Route::get('/agen/dashboard', [AgenDashboardController::class, 'index'])->name('agen.dashboard');
+    Route::get('/agen/jamaah', [AgenDashboardController::class, 'jamaah'])->name('agen.jamaah');
+    Route::get('/agen/pendapatan', [AgenDashboardController::class, 'pendapatan'])->name('agen.pendapatan');
+    Route::get('/agen/jamaah/{jamaah}', [AgenDashboardController::class, 'show'])->name('agen.jamaah.show');
+});

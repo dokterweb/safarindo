@@ -42,7 +42,7 @@
               <div class="card-header">
                 <h3 class="card-title">Data Kelas</h3>
               </div>
-              <div class="table-responsive">
+              <div class="table-responsive p-3">
                 <table id="mytable" class="table table-vcenter card-table">
                   <thead>
                     <tr>

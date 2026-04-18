@@ -2,7 +2,18 @@
 
 @section('content')
 <div class="page-wrapper">
-   
+    <!-- Page header -->
+    <div class="page-header d-print-none">
+      <div class="container-xl">
+          <div class="row g-2 align-items-center">
+          <div class="col">
+              <h2 class="page-title">
+              Data User
+              </h2>
+          </div>
+          </div>
+      </div>
+    </div>
     <!-- Page body -->
     <div class="page-body">
       <div class="container-xl">
@@ -74,7 +85,7 @@
               <div class="card-header bg-blue-lt">
                 <h3 class="card-title">Data users</h3>
               </div>
-              <div class="table-responsive">
+              <div class="table-responsive p-3">
                 <table id="mytable" class="table table-vcenter card-table">
                   <thead>
                     <tr>

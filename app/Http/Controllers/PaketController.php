@@ -171,7 +171,6 @@ class PaketController extends Controller
     public function indexpembayaran()
     {
         $pakets = Paket::withCount('jamaahs')->get();
-
         return view('pembayarans.index', compact('pakets'));
     }
 
@@ -189,5 +188,21 @@ class PaketController extends Controller
             }
         ])->findOrFail($id);
         return view('pembayarans.by_paket', compact('paket'));
+    }
+
+    public function indexpembatalan()
+    {
+        $pakets = Paket::withCount('jamaahs')->get();
+        return view('pembatalans.index', compact('pakets'));
+    }
+
+    public function detailPembatalan($id)
+    {
+        $paket = Paket::with([
+            'jamaahs' => function ($q) {
+                $q->withSum('pembayarans as total_bayar', 'jumlah_bayar');
+            }
+        ])->findOrFail($id);
+        return view('pembatalans.by_paket', compact('paket'));
     }
 }

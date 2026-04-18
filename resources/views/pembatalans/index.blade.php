@@ -4,15 +4,15 @@
 <div class="page-wrapper">
     <!-- Page header -->
     <div class="page-header d-print-none">
-      <div class="container-xl">
-          <div class="row g-2 align-items-center">
-          <div class="col">
-              <h2 class="page-title">
-              Data Jamaah
-              </h2>
-          </div>
-          </div>
-      </div>
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                Data Paket
+                </h2>
+            </div>
+            </div>
+        </div>
     </div>
     <!-- Page body -->
     <div class="page-body">
@@ -26,25 +26,32 @@
                 <thead>
                     <tr>
                     <th>#</th>
-                    <th>Nama Jamaah</th>
-                    <th>No HP</th>
-                    <th>Kota</th>
+                    <th>Nama Paket</th>
+                    <th>Tgl Berangkat</th>
+                    <th>Kuota</th>
+                    <th>Jlh Jamaah</th>
+                    <th>Harga Paket</th>
                     <th class="w-1">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($paket->jamaahs as $p)
+                    @forelse ($pakets as $p)
                         <tr>
                             <td>{{$loop->iteration}}</td>
-                            <td>{{$p->nama_jamaah }} </td>
-                            <td>{{$p->no_hp }} </td>
-                            <td>{{$p->kota }} </td>
+                            <td>{{$p->nama_paket }} </td>
+                            <td>{{$p->tgl_berangkat }} </td>
+                            <td>{{$p->kuota }} </td>
+                            <td>{{$p->jamaahs_count }} </td>
+                            <td>{{ number_format($p->harga_paket) }}</td>
                             <td class="d-flex align-items-center" style="gap: 5px;">
-                              <a href="{{ route('pembayarans.detail', $p->id) }}" class="btn btn-sm btn-primary">
-                                Pembayaran
-                              </a>
-                              <a href="{{ route('keluarproduks.create', ['jamaah_id' => $p->id,'paket_id' => $paket->id]) }}" 
-                                class="btn btn-sm btn-primary">Produk</a>
+                                <a href="{{ route('pakets.pembatalan.detail', $p->id) }}" class="btn btn-sm btn-primary">
+                                    Lihat Jamaah
+                                </a>
+                               {{-- <form method="POST" action="" style="display: inline;" id="delete-form-{{ $p->id }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $p->id }})">Del</button>
+                                </form> --}}
                             </td>
                         </tr>
                     @empty

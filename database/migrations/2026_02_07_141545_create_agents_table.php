@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('kelamin', ['laki-laki', 'perempuan']);
             $table->string('tempat_lahir');
             $table->date('tanggal_lahir');
+            $table->unsignedInteger('fee_agent'); 
             $table->enum('status', ['active', 'non_active']);
             $table->string('alamat');
             $table->string('catatan');

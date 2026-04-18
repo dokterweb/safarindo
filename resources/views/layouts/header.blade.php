@@ -49,6 +49,7 @@
       <div class="collapse navbar-collapse" id="navbar-menu">
         <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
           <ul class="navbar-nav">
+            @role('admin')
             <li class="nav-item">
               <a class="nav-link" href="./" >
                 <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
@@ -94,6 +95,12 @@
                 <a class="dropdown-item {{request()->routeIs('pakets.pembayaran')?'active':''}}" href="{{route('pakets.pembayaran')}}">
                   Pembayaran
                 </a>
+                <a class="dropdown-item {{request()->routeIs('pakets.pembatalan')?'active':''}}" href="{{route('pakets.pembatalan')}}">
+                  Batal / Pindah
+                </a>
+                <a class="dropdown-item {{request()->routeIs('pembatalans')?'active':''}}" href="{{route('pembatalans')}}">
+                  Approve Pembatalan
+                </a>
                 <a class="dropdown-item {{request()->routeIs('diskons')?'active':''}}" href="{{route('diskons')}}">
                   Diskon
                 </a>
@@ -118,6 +125,12 @@
                 </a>
                 <a class="dropdown-item {{request()->routeIs('pembelians')?'active':''}}" href="{{route('pembelians')}}">
                   Pembelian
+                </a>
+                <a class="dropdown-item {{request()->routeIs('agent_transaksis')?'active':''}}" href="{{route('agent_transaksis')}}">
+                  Agent Transaksi
+                </a>
+                <a class="dropdown-item {{request()->routeIs('laporan.neraca')?'active':''}}" href="{{route('laporan.neraca')}}">
+                  Neraca
                 </a>
               </div>
             </li>
@@ -150,6 +163,33 @@
 
               </div>
             </li>
+            @endrole
+            @role('agen')
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('agen.dashboard') }}" >
+                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                  <i class="nav-icon fas fa-cog"></i>
+                </span>
+                <span class="nav-link-title">Home</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('agen.jamaah') }}" >
+                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                  <i class="nav-icon fas fa-cog"></i>
+                </span>
+                <span class="nav-link-title">Jamaah</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('agen.pendapatan') }}" >
+                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                  <i class="nav-icon fas fa-cog"></i>
+                </span>
+                <span class="nav-link-title">Pendapatan</span>
+              </a>
+            </li>
+            @endrole
           </ul>
         </div>
       </div>

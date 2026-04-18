@@ -44,7 +44,7 @@
               <div class="card-header bg-blue-lt">
                 <h3 class="card-title">Data Pengeluaran</h3>
               </div>
-              <div class="table-responsive">
+              <div class="table-responsive p-3">
                 <table id="mytable" class="table table-vcenter card-table">
                   <thead>
                     <tr>

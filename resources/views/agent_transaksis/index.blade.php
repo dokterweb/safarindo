@@ -4,16 +4,22 @@
 <div class="page-wrapper">
     <!-- Page header -->
     <div class="page-header d-print-none">
-      <div class="container-xl">
+        <div class="container-xl">
           <div class="row g-2 align-items-center">
-          <div class="col">
+            <div class="col">
               <h2 class="page-title">
-              Data Jamaah
+                Data Agent
               </h2>
+            </div>
+            <!-- Page title actions -->
+            <div class="col-auto ms-auto d-print-none">
+              <div class="btn-list">
+                <a href="{{route('agents.create')}}" class="btn btn-primary d-none d-sm-inline-block">Create new Agent</a>
+              </div>
+            </div>
           </div>
-          </div>
+        </div>
       </div>
-    </div>
     <!-- Page body -->
     <div class="page-body">
       <div class="container-xl">
@@ -26,35 +32,38 @@
                 <thead>
                     <tr>
                     <th>#</th>
-                    <th>Nama Jamaah</th>
+                    <th>Nama Agent</th>
+                    <th>Email</th>
+                    <th>Kelamin</th>
                     <th>No HP</th>
+                    <th>Jamaah</th>
                     <th>Kota</th>
                     <th class="w-1">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($paket->jamaahs as $p)
+                    @forelse ($agents as $p)
                         <tr>
                             <td>{{$loop->iteration}}</td>
-                            <td>{{$p->nama_jamaah }} </td>
-                            <td>{{$p->no_hp }} </td>
-                            <td>{{$p->kota }} </td>
+                            <td>{{$p->user->name}} </td>
+                            <td>{{$p->user->email}} </td>
+                            <td>{{$p->kelamin}} </td>
+                            <td>{{$p->no_hp}} </td>
+                            <td>{{$p->jamaahs_count }} </td>
+                            <td>{{$p->kota}} </td>
                             <td class="d-flex align-items-center" style="gap: 5px;">
-                              <a href="{{ route('pembayarans.detail', $p->id) }}" class="btn btn-sm btn-primary">
-                                Pembayaran
-                              </a>
-                              <a href="{{ route('keluarproduks.create', ['jamaah_id' => $p->id,'paket_id' => $paket->id]) }}" 
-                                class="btn btn-sm btn-primary">Produk</a>
+                               <a href="{{route('agent_transaksis.jamaah', $p->id)}}" class="btn btn-sm btn-info">Jamaah</a>
+                              
                             </td>
                         </tr>
                     @empty
                     <tr>
-                        <td colspan="6">No Data</td>
+                        <td colspan="8">No Data</td>
                     </tr>
                     @endforelse
                 </tbody>
                 </table>
-              </div>
+            </div>
             </div>
           </div>
         </div>

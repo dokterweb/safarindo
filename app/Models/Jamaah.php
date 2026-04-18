@@ -40,4 +40,10 @@ class Jamaah extends Model
     {
         return $this->hasMany(Keluarproduk::class);
     }
+
+    
+    public function agentTransaksis()
+    {
+        return $this->hasMany(Agent_transaksi::class);
+    }
 }

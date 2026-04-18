@@ -49,7 +49,7 @@
               <div class="card-header bg-blue-lt">
                 <h3 class="card-title">Daa Pengeluaran</h3>
               </div>
-              <div class="table-responsive">
+              <div class="table-responsive p-3">
                 <table id="mytable" class="table table-vcenter card-table">
                   <thead>
                     <tr>
@@ -68,14 +68,14 @@
                                 <td>{{$m->jumlah}} </td>
                                 <td>{{$m->keterangan}} </td>
                                 <td class="d-flex align-items-center">
-                                  {{-- <a href="{{route('maskapais.edit',$m->id)}}" class="btn btn-sm btn-info"><i class="far fa-edit"></i></a>
-                                  <form method="POST" action="{{ route('maskapais.destroy', $m->id) }}" id="delete-form-{{ $m->id }}"> 
+                                  <a href="{{route('pengeluaranbulanantrxs.edit',$m->id)}}" class="btn btn-sm btn-info"><i class="far fa-edit"></i></a>
+                                  <form method="POST" action="{{ route('pengeluaranbulanantrxs.destroy',$m->id) }}" id="delete-form-{{ $m->id }}"> 
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $m->id }})">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
-                                  </form> --}}
+                                  </form>
                                 </td>
                             </tr>
                         @empty

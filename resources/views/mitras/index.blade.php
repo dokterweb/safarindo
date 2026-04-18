@@ -15,35 +15,35 @@
               </div>
               <div class="card-body">
                 <div class="row row-cards">
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-2">
                     <label class="form-label">Nama Mitra</label>
                     <input type="text" name="nama_mitra" class="form-control" value="{{ old('nama_mitra') }}">
                     @error('nama_mitra')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-2">
                     <label class="form-label">No. HP</label>
                     <input type="number" name="no_hp" class="form-control" value="{{ old('no_hp') }}">
                     @error('no_hp')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-2">
                     <label class="form-label">Email</label>
                     <input type="email" name="email" class="form-control" value="{{ old('email') }}">
                     @error('email')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-2">
                     <label class="form-label">Kota</label>
                     <input type="text" name="kota" class="form-control" value="{{ old('kota') }}">
                     @error('kota')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-2">
                     <label class="form-label">Kelamin</label>
                     <select name="kelamin" class="form-select">
                       <option value="laki-laki" {{ old('kelamin') == 'laki-laki' ? 'selected' : '' }}>laki-laki</option>
@@ -53,7 +53,7 @@
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-2">
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
                         <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>active</option>
@@ -63,19 +63,19 @@
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-2">
                     <label class="form-label">alamat</label>
                     <input type="text" name="alamat" class="form-control" value="{{ old('alamat') }}">
                     @error('alamat')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
-                  <div class="mb-3">
-                      <label class="form-label">catatan</label>
-                      <input type="text" name="catatan" class="form-control" value="{{ old('catatan') }}">
-                      @error('catatan')
-                          <span class="text-danger">{{ $message }}</span>
-                      @enderror
+                  <div class="mb-2">
+                    <label class="form-label">catatan</label>
+                    <input type="text" name="catatan" class="form-control" value="{{ old('catatan') }}">
+                    @error('catatan')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                   </div>
                 </div>
               </div>

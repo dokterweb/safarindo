@@ -48,7 +48,7 @@
             </div>
           </div>
           <div class="col-lg-6">
-            <div class="row row-card">
+            <div class="row row-cards">
               <div class="col-md-6">
                 <div class="card">
                   <div class="card-header">

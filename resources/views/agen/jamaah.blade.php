@@ -2,18 +2,6 @@
 
 @section('content')
 <div class="page-wrapper">
-    <!-- Page header -->
-    <div class="page-header d-print-none">
-      <div class="container-xl">
-          <div class="row g-2 align-items-center">
-          <div class="col">
-              <h2 class="page-title">
-              Data Jamaah
-              </h2>
-          </div>
-          </div>
-      </div>
-    </div>
     <!-- Page body -->
     <div class="page-body">
       <div class="container-xl">
@@ -29,22 +17,24 @@
                     <th>Nama Jamaah</th>
                     <th>No HP</th>
                     <th>Kota</th>
+                    <th>Nama Paket</th>
+                    <th>Harga Paket</th>
                     <th class="w-1">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($paket->jamaahs as $p)
+                    @forelse ($jamaahs as $p)
                         <tr>
                             <td>{{$loop->iteration}}</td>
                             <td>{{$p->nama_jamaah }} </td>
                             <td>{{$p->no_hp }} </td>
                             <td>{{$p->kota }} </td>
+                            <td>{{$p->paket->nama_paket }} </td>
+                            <td>{{ number_format($p->paket->harga_paket) }}</td>
                             <td class="d-flex align-items-center" style="gap: 5px;">
-                              <a href="{{ route('pembayarans.detail', $p->id) }}" class="btn btn-sm btn-primary">
-                                Pembayaran
-                              </a>
-                              <a href="{{ route('keluarproduks.create', ['jamaah_id' => $p->id,'paket_id' => $paket->id]) }}" 
-                                class="btn btn-sm btn-primary">Produk</a>
+                                <a href="{{ route('agen.jamaah.show', $p->id) }}" 
+                                    class="btn btn-info btn-sm">Detail
+                                </a>
                             </td>
                         </tr>
                     @empty

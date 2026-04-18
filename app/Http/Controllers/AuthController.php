@@ -31,10 +31,10 @@ class AuthController extends Controller
              $user = Auth::user();
              if ($user->hasRole('admin')) {
                  return redirect()->route('admin.dashboard');
-             } else if ($user->hasRole('ustadz')) {
-                return redirect()->route('ustadz.dashboard');
+             } else if ($user->hasRole('staff')) {
+                return redirect()->route('staff.dashboard');
              } else {
-                 return redirect()->route('siswa.dashboard');
+                 return redirect()->route('agen.dashboard');
              }
          }
          return back()->withErrors([
