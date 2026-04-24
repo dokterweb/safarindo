@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pembayarans', function (Blueprint $table) {
+        Schema::create('suratcutis', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('jumlah_bayar');
-            $table->string('bukti_bayar')->nullable();
-            $table->string('metode_bayar');
-            $table->enum('jenis', ['tabungan', 'pembayaran_paket']);
+            $table->string('no_surat');
             $table->unsignedInteger('paket_id'); 
             $table->foreign('paket_id')->references('id')->on('pakets')->onDelete('cascade');
-            $table->foreign('jamaah_id')->references('id')->on('jamaahs')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreign('jamaah_id')->onDelete('cascade');
+            $table->string('nama_kantor');
+            $table->string('alamat_kantor');
+            $table->string('jabatan');
+            $table->string('catatan')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pembayarans');
+        Schema::dropIfExists('suratcutis');
     }
 };

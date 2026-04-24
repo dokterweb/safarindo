@@ -131,21 +131,6 @@
                                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPilihPaket">
                                             Ambil Paket
                                         </button>
-                                        {{-- PRINT --}}
-                                            @if($jamaah->paket_id_draft)
-                                            <a href="{{ route('jamaah.printPindah', $jamaah->id) }}" 
-                                                class="btn btn-danger" target="_blank">
-                                                Print Surat
-                                            </a>
-
-                                            {{-- KONFIRMASI --}}
-                                            <form method="POST" action="{{ route('jamaah.konfirmasiPaket', $jamaah->id) }}" style="display:inline;">
-                                                @csrf
-                                                <button class="btn btn-success">
-                                                    Konfirmasi Ambil Paket
-                                                </button>
-                                            </form>
-                                        @endif
                                     </div>
                                     @endif
                                   <div class="col-auto">
@@ -259,7 +244,7 @@
 
 <div class="modal fade" id="modalPilihPaket" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <form method="POST" action="{{ route('jamaah.draftPaket', $jamaah->id) }}">
+        <form method="POST" action="{{ route('jamaah.ambilPaket', $jamaah->id) }}">
             @csrf
             <div class="modal-content">
 

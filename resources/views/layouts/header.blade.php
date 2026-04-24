@@ -139,6 +139,26 @@
                 <span class="nav-link-icon d-md-none d-lg-inline-block">
                   <i class="nav-icon fas fa-cog"></i>
                 </span>
+                <span class="nav-link-title">Surat</span>
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item {{request()->routeIs('suratrekoms')?'active':''}}" href="{{route('suratrekoms')}}">
+                  Surat Rekomendasi
+                </a>
+                <a class="dropdown-item {{request()->routeIs('suratcutis')?'active':''}}" href="{{route('suratcutis')}}">
+                  Surat Cuti
+                </a>
+                <a class="dropdown-item {{request()->routeIs('pembatalans.indexprint')?'active':''}}" href="{{route('pembatalans.indexprint')}}">
+                  Pindah Paket
+                </a>
+                
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#navbar-help" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
+                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                  <i class="nav-icon fas fa-cog"></i>
+                </span>
                 <span class="nav-link-title">Master</span>
               </a>
               <div class="dropdown-menu">
@@ -159,6 +179,9 @@
                 </a>
                 <a class="dropdown-item {{request()->routeIs('produks')?'active':''}}" href="{{route('produks')}}">
                   Produk
+                </a>
+                <a class="dropdown-item {{request()->routeIs('jamaahs.prospek')?'active':''}}" href="{{route('jamaahs.prospek')}}">
+                  Calon Jamaah
                 </a>
 
               </div>

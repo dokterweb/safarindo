@@ -22,7 +22,7 @@ class StoreJamaahRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nik' => 'required|digits:16|unique:jamaahs,nik',
+            'nik'           => 'required|digits:16|unique:jamaahs,nik',
             'nama_jamaah'   => 'required|string|max:255',
             'no_hp'         => 'required|string|max:15',
             'kota'          => 'required|string|max:255',

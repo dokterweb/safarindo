@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agent_transaksi;
 use App\Models\Pembatalan;
 use App\Models\Pembayaran;
-use App\Models\Agent_transaksi;
-use Carbon\Carbon;
 use App\Models\Transaksi;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Mpdf\Mpdf;
 
 class PembatalanController extends Controller
 {
@@ -146,5 +147,70 @@ class PembatalanController extends Controller
         ]);
 
         return back()->with('success', 'Permintaan berhasil ditolak.');
+    }
+
+    public function indexprint()
+    {
+        $data = Pembatalan::with(['jamaah.paket', 'paket'])
+        ->where('jenis', 'pemindahan')
+        ->latest()->get();
+        return view('pembatalans.index_print', compact('data'));
+    }
+
+    public function print(Pembatalan $pembatalan)
+    {
+        $pembatalan->load(['jamaah', 'paket', 'paketTujuan']);
+
+        $jamaah = $pembatalan->jamaah;
+        $paketAwal = $pembatalan->paket;
+        $paketBaru = $pembatalan->paketTujuan;
+
+        // 🔥 Format tanggal
+        $tanggalSurat = Carbon::now()->translatedFormat('d F Y');
+
+        $tglAwal = Carbon::parse($paketAwal->tgl_berangkat)
+            ->translatedFormat('d F Y');
+
+        $tglBaru = Carbon::parse($paketBaru->tgl_berangkat)
+            ->translatedFormat('d F Y');
+
+        // INIT PDF
+        $mpdf = new Mpdf([
+            'format' => 'A4',
+            'margin_top' => 0,
+            'margin_bottom' => 0,
+            'margin_left' => 0,
+            'margin_right' => 0,
+        ]);
+
+        // Background full (kop surat kamu)
+        $mpdf->showImageErrors = true;
+        $mpdf->SetDefaultBodyCSS('background', "url('" . public_path('storage/img/backgroundsurat.png') . "')");
+        $mpdf->SetDefaultBodyCSS('background-image-resize', 6);
+
+        // Ambil view
+        $html = view('pembatalans.pdf', compact('pembatalan','jamaah','paketAwal','paketBaru','tglAwal', 'tglBaru'))->render();
+
+        // Wrapper supaya tidak nabrak header/footer
+        $content = '
+            <div style="
+                padding-top: 180px;
+                padding-left: 60px;
+                padding-right: 60px;
+                padding-bottom: 120px;
+                font-family: sans-serif;
+                font-size: 12px;
+                line-height: 1.8;
+            ">
+                '.$html.'
+            </div>
+        ';
+
+        $mpdf->WriteHTML($content);
+
+        return response($mpdf->Output(
+            'surat-rekom-'.$jamaah->nama_jamaah.'.pdf',
+            'I'
+        ))->header('Content-Type', 'application/pdf');
     }
 }

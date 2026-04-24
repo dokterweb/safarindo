@@ -28,6 +28,7 @@ return new class extends Migration
                 ->constrained('pakets')
                 ->nullOnDelete();
 
+            $table->string('no_surat')->nullable();
             // Jenis pengajuan
             $table->enum('jenis', ['pemindahan', 'pembatalan']);
 

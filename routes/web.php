@@ -20,6 +20,8 @@ use App\Http\Controllers\PengeluaranbulananController;
 use App\Http\Controllers\PengeluaranbulanantrxController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SuratcutiController;
+use App\Http\Controllers\SuratrekomController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -104,11 +106,34 @@ Route::put('pengeluaranbulanantrxs/{id}', [PengeluaranbulanantrxController::clas
 Route::delete('pengeluaranbulanantrxs/{id}', [PengeluaranbulanantrxController::class, 'destroy'])
     ->name('pengeluaranbulanantrxs.destroy');
     
+Route::get('/jamaahs/prospek', [JamaahController::class, 'prospek'])->name('jamaahs.prospek');
+Route::get('/jamaahs/create-tabungan', [JamaahController::class, 'createTabungan'])->middleware('role:admin')->name('jamaahs.create.tabungan');
+
+Route::post('/jamaahs/store-tabungan', [JamaahController::class, 'storeTabungan'])
+    ->middleware('role:admin')
+    ->name('jamaahs.store.tabungan');
+Route::get('/jamaahs/{jamaah}/print-pindah-paket', [JamaahController::class, 'printPindahPaket'])->name('jamaahs.printPindahPaket');
+
+// simpan draft paket
+Route::post('/jamaah/{jamaah}/draft-paket', [JamaahController::class, 'draftPaket'])
+    ->name('jamaah.draftPaket');
+
+// print surat
+Route::get('/jamaah/{jamaah}/print-pindah', [JamaahController::class, 'printPindahPaket'])
+    ->name('jamaah.printPindah');
+
+// konfirmasi ambil paket
+Route::post('/jamaah/{jamaah}/konfirmasi-paket', [JamaahController::class, 'konfirmasiPaket'])
+    ->name('jamaah.konfirmasiPaket');
+    
+    
 Route::get('/pakets/{id}/jamaah/create', [JamaahController::class, 'createByPaket'])->middleware('role:admin')->name('pakets.jamaah.create');
 Route::post('/pakets/{id}/jamaah/store', [JamaahController::class, 'storeByPaket'])->middleware('role:admin')->name('pakets.jamaah.store');
 Route::get('/jamaahs/{id}', [JamaahController::class, 'show'])->middleware('role:admin')->name('jamaahs.show');
 Route::get('/jamaahs/{id}/edit', [JamaahController::class, 'edit'])->middleware('role:admin')->name('jamaahs.edit');
 Route::put('/jamaahs/{id}', [JamaahController::class, 'update'])->middleware('role:admin')->name('jamaahs.update');
+
+
 
 // Route::get('/pembayarans/{id}', [PembayaranController::class, 'detail'])->middleware('role:admin')->name('pembayarans.detail');
 
@@ -116,6 +141,9 @@ Route::get('/pembayarans/{jamaah}', [PembayaranController::class, 'detail'])->mi
 Route::post('/pembayarans/{jamaah}/store', [PembayaranController::class, 'store'])->middleware('role:admin')->name('pembayarans.store');
 Route::put('/pembayarans/{pembayaran}/update', [PembayaranController::class, 'update'])
     ->name('pembayarans.update');
+Route::get('/pembayarans/{jamaah}/print', [PembayaranController::class, 'print'])->middleware('role:admin')->name('pembayarans.print');
+Route::post('/jamaah/{jamaah}/ambil-paket', [JamaahController::class, 'ambilPaket'])
+    ->name('jamaah.ambilPaket');
 
 Route::get('/diskons',[DiskonController::class, 'index'])->middleware('role:admin')->name('diskons');
 Route::post('/diskons/{jamaah}', [DiskonController::class, 'store'])->name('diskons.store');
@@ -151,6 +179,10 @@ Route::put('/keluarproduks/{id}', [KeluarprodukController::class, 'update'])->na
 
 Route::get('/pakets/pembatalan',[PaketController::class, 'indexpembatalan'])->middleware('role:admin')->name('pakets.pembatalan');
 Route::get('/pakets/{id}/pembatalan', [PaketController::class, 'detailpembatalan'])->middleware('role:admin')->name('pakets.pembatalan.detail');
+
+Route::get('/pembatalans/print', [PembatalanController::class, 'indexprint'])->name('pembatalans.indexprint');
+Route::get('/pembatalans/{pembatalan}/print', [PembatalanController::class, 'print'])->name('pembatalans.print');
+
 Route::get('/pembatalans', [PembatalanController::class, 'indexsetuju'])->middleware('role:admin')->name('pembatalans');
 Route::post('/pembatalans/store', [PembatalanController::class, 'store'])->middleware('role:admin')->name('pembatalans.store');
 Route::post('/pembatalans/{id}/approve', [PembatalanController::class, 'approve'])->middleware('role:admin')->name('pembatalans.approve');
@@ -159,6 +191,24 @@ Route::prefix('pembatalans')->middleware('role:admin')->group(function () {
     Route::post('/{id}/approve', [PembatalanController::class, 'approve'])->name('pembatalans.approve');
     Route::post('/{id}/reject', [PembatalanController::class, 'reject'])->name('pembatalans.reject');
 });
+
+Route::get('/suratrekoms', [SuratrekomController::class, 'index'])->name('suratrekoms');
+Route::get('/suratrekoms/create', [SuratrekomController::class, 'create'])->name('suratrekoms.create');
+Route::post('/suratrekoms/store', [SuratrekomController::class, 'store'])->name('suratrekoms.store');
+Route::get('/suratrekoms/{id}/edit', [SuratrekomController::class, 'edit'])->name('suratrekoms.edit');
+Route::put('/suratrekoms/{id}', [SuratrekomController::class, 'update'])->name('suratrekoms.update');
+// AJAX cari jamaah
+Route::get('/suratrekoms/search-jamaah', [SuratrekomController::class, 'searchJamaah']);
+Route::get('/suratrekoms/{suratrekom}/print', [SuratrekomController::class, 'print'])->middleware('role:admin')->name('suratrekoms.print');
+Route::delete('/suratrekoms/{id}', [SuratrekomController::class, 'destroy'])->name('suratrekoms.destroy');
+
+Route::get('/suratcutis', [SuratcutiController::class, 'index'])->name('suratcutis');
+Route::get('/suratcutis/create', [SuratcutiController::class, 'create'])->name('suratcutis.create');
+Route::post('/suratcutis/store', [SuratcutiController::class, 'store'])->name('suratcutis.store');
+Route::get('/suratcutis/{id}/edit', [SuratcutiController::class, 'edit'])->name('suratcutis.edit');
+Route::put('/suratcutis/{id}', [SuratcutiController::class, 'update'])->name('suratcutis.update');
+Route::get('/suratcutis/search-jamaah', [SuratcutiController::class, 'searchJamaah']);
+Route::get('/suratcutis/{suratcuti}/print', [SuratcutiController::class, 'print'])->name('suratcutis.print');
 
 Route::get('/laporan/neraca', [LaporanController::class, 'neraca'])->middleware('role:admin')->name('laporan.neraca');
     

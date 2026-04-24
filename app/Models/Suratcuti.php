@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-use App\Models\Jamaah;
-use App\Models\Paket;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Pembayaran extends Model
+class Suratcuti extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable=['jumlah_bayar', 'bukti_bayar', 'metode_bayar', 'jenis','paket_id', 'jamaah_id', 'user_id'];
-    
+    protected $fillable=['no_surat', 'paket_id', 'jamaah_id', 'nama_kantor', 'alamat_kantor', 'jabatan', 'catatan'];
+
     public function paket()
     {
         return $this->belongsTo(Paket::class);

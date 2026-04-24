@@ -32,11 +32,12 @@ return new class extends Migration
             $table->string('foto_kk')->nullable();
             $table->string('foto_pasport1')->nullable();
             $table->string('foto_pasport2')->nullable();
+            $table->integer('paket_id_draft ')->nullable();
             $table->foreignId('paket_id')->constrained()->onDelete('cascade');
             $table->foreignId('agent_id')->constrained()->onDelete('cascade');
             // $table->foreign('paket_id')->references('id')->on('pakets')->onDelete('cascade');
             // $table->foreign('agent_id')->references('id')->on('agents')->onDelete('cascade');
-            $table->enum('status', ['aktif', 'pindah_paket', 'batal']);
+            $table->enum('status', ['prospek','aktif', 'pindah_paket', 'batal']);
             $table->enum('lunas', ['0', '1']);
             $table->softDeletes();
             $table->timestamps();

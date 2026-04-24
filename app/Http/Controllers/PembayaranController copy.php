@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jamaah;
-use App\Models\Paket;
 use App\Models\Pembayaran;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
@@ -29,42 +28,24 @@ class PembayaranController extends Controller
     {
         $data = $this->getDataPembayaran($jamaah);
         return view('pembayarans.detail', $data);
+        /* $jamaah->load('paket', 'pembayarans');
+
+        $totalBayar = $jamaah->pembayarans->sum('jumlah_bayar');
+        $tagihan = $jamaah->paket->harga_paket;
+        $sisa = $tagihan - $totalBayar;
+ 
+        return view('pembayarans.detail', compact('jamaah','totalBayar','tagihan','sisa'));*/
     }
 
     private function getDataPembayaran(Jamaah $jamaah)
     {
         $jamaah->load('paket', 'pembayarans');
-        $pakets = Paket::where('status', 'active')->get();
-        // 🔥 pisahkan
-        $tabungan = $jamaah->pembayarans->where('jenis', 'tabungan')->sum('jumlah_bayar');
 
-        $pembayaranPaket = $jamaah->pembayarans->where('jenis', 'paket')->sum('jumlah_bayar');
-        $isTabungan = is_null($jamaah->paket_id);
-        // 🔥 jika belum punya paket
-        if (!$jamaah->paket_id) {
-            return [
-                'jamaah'        => $jamaah,
-                'totalTabungan' => $tabungan,
-                'mode'          => 'tabungan',
-                'isTabungan'    => $isTabungan,
-                'pakets'        => $pakets
-            ];
-        }
-
-        // 🔥 jika sudah paket
+        $totalBayar = $jamaah->pembayarans->sum('jumlah_bayar');
         $tagihan = $jamaah->paket->harga_paket;
-        $sisa = $tagihan - $pembayaranPaket;
+        $sisa = $tagihan - $totalBayar;
 
-        return [
-            'jamaah'        => $jamaah,
-            'totalBayar'    => $pembayaranPaket,
-            'tagihan'       => $tagihan,
-            'sisa'          => $sisa,
-            'totalTabungan' => $tabungan,
-            'mode'          => 'paket',
-            'isTabungan'    => $isTabungan,
-            'pakets'        => $pakets
-        ];
+        return compact('jamaah','totalBayar','tagihan','sisa');
     }
 
     public function store(Request $request, Jamaah $jamaah)
@@ -79,18 +60,12 @@ class PembayaranController extends Controller
     
         try {
     
-            // 🔥 DETEKSI JENIS
-            $jenis = $jamaah->paket_id ? 'paket' : 'tabungan';
-    
             $totalBayar = $jamaah->pembayarans()->sum('jumlah_bayar');
+            $tagihan = $jamaah->paket->harga_paket;
     
-            // 🔥 VALIDASI hanya untuk paket
-            if ($jenis === 'paket') {
-                $tagihan = $jamaah->paket->harga_paket;
-    
-                if (($totalBayar + $request->jumlah_bayar) > $tagihan) {
-                    return back()->with('error', 'Pembayaran melebihi tagihan!');
-                }
+            // 🔥 VALIDASI OVERPAYMENT
+            if (($totalBayar + $request->jumlah_bayar) > $tagihan) {
+                return back()->with('error', 'Pembayaran melebihi tagihan!');
             }
     
             // upload bukti
@@ -102,33 +77,26 @@ class PembayaranController extends Controller
             // ✅ SIMPAN PEMBAYARAN
             $pembayaran = Pembayaran::create([
                 'jamaah_id' => $jamaah->id,
-                'paket_id' => $jamaah->paket_id, // bisa null
+                'paket_id' => $jamaah->paket_id,
                 'user_id' => auth()->id(),
                 'jumlah_bayar' => $request->jumlah_bayar,
                 'metode_bayar' => $request->metode_bayar,
                 'bukti_bayar' => $bukti,
-                'jenis' => $jenis, // 🔥 tambahan penting
             ]);
     
-            // ✅ SIMPAN TRANSAKSI (ledger tetap jalan)
+            // ✅ SIMPAN TRANSAKSI
             Transaksi::create([
-                'group_id' => 4, // pemasukan
+                'group_id' => 4,
                 'referensi_id' => $pembayaran->id,
-                'keterangan' => ($jenis === 'tabungan' 
-                    ? 'Tabungan jamaah ' 
-                    : 'Pembayaran paket jamaah ')
-                    . $jamaah->nama_jamaah . ' - id: ' . $jamaah->id,
+                'keterangan' => 'Pembayaran cicilan jamaah ' . $jamaah->nama_jamaah . ' - id_jamaah: ' . $jamaah->id,
                 'jumlah' => $pembayaran->jumlah_bayar,
                 'paket_id' => $jamaah->paket_id,
             ]);
     
-            // 🔥 UPDATE LUNAS (hanya paket)
-            if ($jenis === 'paket') {
-                $totalBaru = $totalBayar + $request->jumlah_bayar;
-    
-                if ($totalBaru >= $tagihan) {
-                    $jamaah->update(['lunas' => '1']);
-                }
+            // 🔥 OPTIONAL: UPDATE STATUS LUNAS
+            $totalBaru = $totalBayar + $request->jumlah_bayar;
+            if ($totalBaru >= $tagihan) {
+                $jamaah->update(['lunas' => '1']);
             }
     
             DB::commit();
@@ -137,7 +105,8 @@ class PembayaranController extends Controller
     
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', $e->getMessage());
+    
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -148,88 +117,72 @@ class PembayaranController extends Controller
             'metode_bayar' => 'required|string',
             'bukti_bayar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-
+    
         DB::beginTransaction();
-
+    
         try {
-
+    
             $jamaah = $pembayaran->jamaah;
-
-            $isTabungan = is_null($jamaah->paket_id);
-
-            // 🔥 HITUNG TOTAL TANPA DATA INI
+    
+            // 🔥 HITUNG ULANG
             $totalLain = $jamaah->pembayarans()
                 ->where('id', '!=', $pembayaran->id)
                 ->sum('jumlah_bayar');
-
-            // =========================
-            // 🔥 KHUSUS PAKET
-            // =========================
-            if (!$isTabungan) {
-
-                $tagihan = $jamaah->paket->harga_paket;
-
-                if (($totalLain + $request->jumlah_bayar) > $tagihan) {
-                    return back()->with('error', 'Pembayaran melebihi tagihan!');
-                }
+    
+            $tagihan = $jamaah->paket->harga_paket;
+    
+            if (($totalLain + $request->jumlah_bayar) > $tagihan) {
+                return back()->with('error', 'Pembayaran melebihi tagihan!');
             }
-
-            // =========================
-            // 🔥 UPLOAD FILE
-            // =========================
+    
+            // 🔥 HANDLE UPLOAD BARU
             $bukti = $pembayaran->bukti_bayar;
-
+    
             if ($request->hasFile('bukti_bayar')) {
-
+    
+                // hapus lama
                 if ($bukti && Storage::disk('public')->exists($bukti)) {
                     Storage::disk('public')->delete($bukti);
                 }
-
+    
+                // upload baru
                 $bukti = $request->file('bukti_bayar')->store('pembayaran', 'public');
             }
-
-            // =========================
+    
             // 🔥 UPDATE PEMBAYARAN
-            // =========================
             $pembayaran->update([
                 'jumlah_bayar' => $request->jumlah_bayar,
                 'metode_bayar' => $request->metode_bayar,
                 'bukti_bayar' => $bukti,
             ]);
-
-            // =========================
-            // 🔥 UPDATE TRANSAKSI
-            // =========================
+    
+            // 🔥 HAPUS TRANSAKSI LAMA
             Transaksi::where('referensi_id', $pembayaran->id)
                 ->where('group_id', 4)
                 ->delete();
-
+    
+            // 🔥 INSERT TRANSAKSI BARU
             Transaksi::create([
                 'group_id' => 4,
                 'referensi_id' => $pembayaran->id,
                 'keterangan' => 'Update pembayaran jamaah ' . $jamaah->nama_jamaah,
                 'jumlah' => $request->jumlah_bayar,
-                'paket_id' => $jamaah->paket_id, // null kalau tabungan (OK)
+                'paket_id' => $jamaah->paket_id,
             ]);
-
-            // =========================
-            // 🔥 UPDATE STATUS (HANYA PAKET)
-            // =========================
-            if (!$isTabungan) {
-
-                $totalBaru = $totalLain + $request->jumlah_bayar;
-
-                $jamaah->update([
-                    'lunas' => $totalBaru >= $tagihan ? '1' : '0'
-                ]);
-            }
-
+    
+            // 🔥 UPDATE STATUS
+            $totalBaru = $totalLain + $request->jumlah_bayar;
+    
+            $jamaah->update([
+                'lunas' => $totalBaru >= $tagihan ? '1' : '0'
+            ]);
+    
             DB::commit();
-
+    
             return back()->with('success', 'Pembayaran berhasil diupdate');
-
+    
         } catch (\Exception $e) {
-
+    
             DB::rollBack();
             return back()->with('error', $e->getMessage());
         }
@@ -288,5 +241,4 @@ class PembayaranController extends Controller
             'I'
         ))->header('Content-Type', 'application/pdf');
     }
-
 }
