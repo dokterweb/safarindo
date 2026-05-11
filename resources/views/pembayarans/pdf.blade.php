@@ -41,7 +41,7 @@ body {
 <table width="100%" class="mb-3">
     <tr>
         <td>Data Travel</td>
-        <td class="text-end">Data Travel</td>
+        <td class="text-end">Data Jamaah</td>
     </tr>
     <tr>
         <td class="fw-bold">SAFARINDO ALBAROKAH UMROH</td>
@@ -55,7 +55,48 @@ body {
         <td class="text-end">{{ $jamaah->alamat }}</td>
     </tr>
 </table>
-
+<br>
+<h4>Data Paket</h4>
+<table width="65%" class="mb-3">
+    <tr>
+        <td>Data Paket</td>
+        <td>{{$jamaah->paket->nama_paket}}</td>
+    </tr>
+    <tr>
+        <td>Harga Paket</td>
+        <td>Rp. {{number_format($jamaah->paket->harga_paket)}}</td>
+    </tr>
+    <tr>
+        <td>Tanggal Berangkat</td>
+        <td>{{$jamaah->paket->tgl_berangkat->translatedFormat('d F Y')}}</td>
+    </tr>
+    <tr>
+        <td>Tipe Kamar</td>
+        <td>{{$jamaah->tipeKamar->nama_kamar}}</td>
+    </tr>
+    <tr>
+        <td>Harga Kamar</td>
+        <td>Rp. {{number_format($jamaah->tipeKamar->harga_kamar)}}</td>
+    </tr>
+    <tr>
+        <td>Total Bayar</td>
+        <td>Rp {{ number_format($totalBayar) }}</td>
+    </tr>
+    <tr>
+        <td>Total Tagihan</td>
+        <td>Rp {{ number_format($tagihan) }}</td>
+    </tr>
+    <tr>
+        <td>Diskon</td>
+        <td>Rp {{ number_format($jumlahDiskon) }}</td>
+    </tr>
+    <tr>
+        <td>Sisa Tagihan</td>
+        <td>Rp {{ number_format($sisa) }}</td>
+    </tr>
+    
+</table>
+<h4>Catatan Manifest Jamaah</h4>
 <table class="table mb-3">
     <thead>
         <tr>
@@ -77,17 +118,22 @@ body {
     </tbody>
 </table>
 
-<table width="100%" style="line-height: 2em">
+<table width="100%">
     <tr>
-        <td><b>{{strtoupper($jamaah->paket->nama_paket)}}</b> Total Tagihan</td>
-        <td class="text-end">Rp {{ number_format($tagihan) }}</td>
-    </tr>
-    <tr>
-        <td>Total Bayar</td>
-        <td class="text-end">Rp {{ number_format($totalBayar) }}</td>
-    </tr>
-    <tr>
-        <td class="fw-bold">Sisa</td>
-        <td class="text-end fw-bold">Rp {{ number_format($sisa) }}</td>
+        <td>
+            <span style="font-size: 10px;">
+            Ketentuan Pembatalan:<br>
+            Akan dikenakan biaya administrasi dari harga paket bila:<br>
+            a.10 % setelah proses administrasi<br>
+            b.50 % sejak 45 Hari sebelum keberangkatan.<br>
+            c.75% sejak 3 Minggu sebelum keberangkatan<br>
+            </span>
+        </td>
+        <td class="text-center">
+            Medan, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
+            SAFARINDO ALBAROKAH UMROH<br><br><br><br><br><br>
+            Rina Halizah Nasution, S.Akun<br>
+            SPV-Safarindo Albarokah Umroh
+        </td>
     </tr>
 </table>

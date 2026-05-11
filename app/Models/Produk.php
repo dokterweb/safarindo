@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Produk extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable=['nama_produk', 'standar_stok', 'stok', 'unit_id', 'harga_beli', 'harga_jual', 'catatan', 'foto_produk'];
+    protected $fillable=['nama_produk', 'standar_stok', 'stok', 'unit_id', 'harga_beli', 'harga_jual', 'include_paket', 'catatan', 'foto_produk'];
 
     public function unit()
     {

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
             $table->bigInteger('harga_beli')->default(0);
             $table->bigInteger('harga_jual')->default(0);
+            $table->enum('include_paket', ['0', '1']);
             $table->text('catatan')->nullable();
             $table->string('foto_produk')->nullable();
             $table->softDeletes();

@@ -26,6 +26,7 @@ class AgentEditRequest extends FormRequest
             'kelamin'           => ['required', 'string', 'in:laki-laki,perempuan'], 
             'tempat_lahir'      => ['required', 'string', 'max:255'],
             'tanggal_lahir'     => ['required','date'],
+            'fee_agent'         => ['required','integer'],
             'status'            => ['required', 'string', 'in:active,non_active'], 
             'foto_agent'        => ['nullable','string','max:255'],
             'alamat'            => ['required','string','max:255'],

@@ -23,22 +23,27 @@
                                             @if(!$isTabungan)
                                                 <dt class="col-5">Nama Paket:</dt>
                                                 <dd class="col-7">{{ $jamaah->paket->nama_paket }}</dd>
-                                            
+                                                <dt class="col-5">Harga Paket:</dt>
+                                                <dd class="col-7">Rp. {{ number_format($jamaah->paket->harga_paket) }}</dd>
                                             @endif
                                             <dt class="col-5">No.HP:</dt>
                                             <dd class="col-7">{{$jamaah->no_hp}}</dd>
                                             <dt class="col-5">Kelamin:</dt>
                                             <dd class="col-7">{{$jamaah->kelamin}}</dd>
                                             <dt class="col-5">Tempat/Tgl Lahir</dt>
-                                            <dd class="col-7">{{$jamaah->tempat_lahir.' / '.$jamaah->tanggal_lahir}}</dd>
+                                            <dd class="col-7">{{$jamaah->tempat_lahir.' / '.$jamaah->tanggal_lahir->translatedFormat('d F Y')}}</dd>
                                             <dt class="col-5">Alamat:</dt>
                                             <dd class="col-7">{{$jamaah->alamat}}</dd>
+                                            @if(!$isTabungan)
+                                            <dt class="col-5">Tipe Kamar:</dt>
+                                            <dd class="col-7">{{$jamaah->tipeKamar->nama_kamar.' - Rp.'.number_format($jamaah->tipeKamar->harga_kamar)}}</dd>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         @if($jamaah->foto_ktp)
-                                        <img src="{{ asset('storage/'.$jamaah->foto_ktp) }}" width="200">
-                                      @endif    
+                                            <img src="{{ asset('storage/'.$jamaah->foto_ktp) }}" width="200">
+                                        @endif    
                                     </div>
                                 </div>
                             </div>
@@ -51,78 +56,82 @@
                                 <h3 class="card-title">{{ $isTabungan ? 'TABUNGAN CALON JAMAAH' : 'PEMBAYARAN PAKET UMROH' }}</h3>
                             </div>
                             <div class="card-body">
-                            <div class="table-responsive p-3">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Tgl</th>
-                                            <th>Jenis</th>
-                                            <th>Bukti</th>
-                                            <th>Jumlah</th>
-                                            <th>Act</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($jamaah->pembayarans as $p)
+                                <div class="table-responsive p-3">
+                                    <table class="table">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $p->created_at->format('Y-m-d') }}</td>
-                                                <td>{{ $p->metode_bayar }}</td>
-                                                <td>
-                                                    @if($p->bukti_bayar)
-                                                        <a href="{{ asset('storage/'.$p->bukti_bayar) }}" target="_blank">Lihat</a>
-                                                    @endif
-                                                </td>
-                                                <td>{{ number_format($p->jumlah_bayar) }}</td>
-                                                <td>
-                                                    <a href="#" class="btn btn-sm btn-danger btn-edit" data-bs-toggle="modal"
-                                                        data-id="{{ $p->id }}"
-                                                        data-jumlah="{{ $p->jumlah_bayar }}"
-                                                        data-metode="{{ $p->metode_bayar }}"
-                                                        data-bukti="{{ $p->bukti_bayar }}">
-                                                        Edit
-                                                    </a>
-                                                </td>
+                                                <th>No</th>
+                                                <th>Tgl</th>
+                                                <th>Jenis</th>
+                                                <th>Bukti</th>
+                                                <th>Jumlah</th>
+                                                <th>Act</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                                @if($isTabungan)
-                                <table class="table">
-                                    <tr>
-                                        <td>Total Tabungan:</td>
-                                        <td>{{ number_format($totalTabungan) }}</td>
-                                    </tr>
-                                </table>
-                                @endif
-                                @if(!$isTabungan)
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($jamaah->pembayarans as $p)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $p->created_at->format('d-m-Y') }}</td>
+                                                    <td>{{ $p->metode_bayar }}</td>
+                                                    <td>
+                                                        @if($p->bukti_bayar)
+                                                            <a href="{{ asset('storage/'.$p->bukti_bayar) }}" target="_blank">Lihat</a>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ number_format($p->jumlah_bayar) }}</td>
+                                                    <td>
+                                                        <a href="#" class="btn btn-sm btn-danger btn-edit" data-bs-toggle="modal"
+                                                            data-id="{{ $p->id }}"
+                                                            data-jumlah="{{ $p->jumlah_bayar }}"
+                                                            data-metode="{{ $p->metode_bayar }}"
+                                                            data-bukti="{{ $p->bukti_bayar }}">
+                                                            Edit
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                    @if($isTabungan)
                                     <table class="table">
                                         <tr>
-                                            <td>Total Bayar:</td>
-                                            <td>{{ number_format($totalBayar) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Total Tagihan:</td>
-                                            <td>{{ number_format($tagihan) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sisa:</td>
-                                            <td>{{ number_format($sisa) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Status:</td>
-                                            <td>
-                                                @if($sisa <= 0)
-                                                    <span class="text-success">Lunas</span>
-                                                @else
-                                                    <span class="text-danger">Belum Lunas</span>
-                                                @endif
-                                            </td>
+                                            <td>Total Tabungan:</td>
+                                            <td>{{ number_format($totalTabungan) }}</td>
                                         </tr>
                                     </table>
-                                @endif
-                            </div>
+                                    @endif
+                                    @if(!$isTabungan)
+                                        <table class="table">
+                                            <tr>
+                                                <td>Total Bayar:</td>
+                                                <td>{{ number_format($totalBayar) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Diskon:</td>
+                                                <td>{!! $infoDiskon !!}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Total Tagihan:</td>
+                                                <td>{{ number_format($tagihan) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sisa:</td>
+                                                <td>{{ number_format($sisa) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Status:</td>
+                                                <td>
+                                                    @if($sisa <= 0)
+                                                        <span class="text-success">Lunas</span>
+                                                    @else
+                                                        <span class="text-danger">Belum Lunas</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    @endif
+                                </div>
                             </div>
                             <div class="card-footer">
                                 <div class="row align-items-center">
@@ -154,9 +163,20 @@
                                         target="_blank">
                                         <i class="fa fa-print"></i> {{ $isTabungan ? 'Print Tabungan' : 'Print Invoice' }}
                                      </a>
+                                     @if($bolehSerahTerima)
+                                        @if(!$sudahSerahTerima)
+                                            <a href="{{ route('jamaah.paket.produk', $jamaah->id) }}" class="btn btn-primary">
+                                                Serah Terima Barang
+                                            </a>
+                                        @else
+                                            <a href="{{ route('jamaah.paket.produk.edit', $jamaah->id) }}" class="btn btn-warning">
+                                                Edit Terima Barang
+                                            </a>
+                                        @endif
+                                    @endif
                                   </div>
                                 </div>
-                              </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -177,7 +197,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label>Metode</label>
-                                    <select name="metode_bayar" class="form-control">
+                                    <select name="metode_bayar" class="form-select">
                                         <option value="transfer">Transfer</option>
                                         <option value="tunai">Tunai</option>
                                     </select>

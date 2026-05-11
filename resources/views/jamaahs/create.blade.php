@@ -45,7 +45,7 @@
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>Kelamin</label>
+                            <label class="form-label">Kelamin</label>
                             <select name="kelamin" class="form-select">
                                 <option value="laki-laki" {{ old('kelamin') == 'laki-laki' ? 'selected' : '' }}>laki-laki</option>
                                 <option value="perempuan" {{ old('kelamin') == 'perempuan' ? 'selected' : '' }}>perempuan</option>
@@ -68,6 +68,7 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
+                        @hasanyrole('admin|staff')
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Nama Agent</label>
                             <select name="agent_id" id="agent_id" class="form-select" required>
@@ -77,19 +78,28 @@
                                 @endforeach
                             </select>   
                         </div>
-                        <div class="col-md-6 mb-3">
+                        @endhasanyrole
+                        <div class="col-md-5 mb-3">
                             <label class="form-label">alamat</label>
                             <input type="text" name="alamat" class="form-control" value="{{ old('alamat') }}">
                             @error('alamat')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-5 mb-3">
                             <label class="form-label">catatan</label>
                             <input type="text" name="catatan" class="form-control" value="{{ old('catatan') }}">
                             @error('catatan')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Tipe Kamar</label>
+                            <select name="tipe_kamar_id" id="tipe_kamar_id" class="form-select" required>
+                                @foreach ($tipeKamars as $a)
+                                    <option value="{{ $a->id }}" {{ old('tipe_kamar_id') == $a->id ? 'selected' : '' }}>{{ $a->nama_kamar }}</option>
+                                @endforeach
+                            </select>   
                         </div>
                     </div>
                 </div>

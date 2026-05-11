@@ -11,8 +11,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Paket extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable=['nama_paket', 'tgl_berangkat', 'jlh_hari', 'status', 'maskapai_id', 'rute', 'lokasi_berangkat', 'kuota', 'jenis_paket', 'hotel_makah_id', 'hotel_madinah_id', 'hotel_transit_id', 'harga_paket', 'include_desc', 'exclude_desc', 'syaratketentuan', 'catatan', 'foto_paket'];
-    
+    protected $fillable=['nama_paket', 'tgl_berangkat', 'jlh_hari', 'status', 'maskapai_id','rute', 'lokasi_berangkat', 'kuota', 'jenis_paket', 'hotel_makah_id', 'hotel_madinah_id', 'hotel_transit_id', 'harga_paket', 'include_desc', 'exclude_desc', 'syaratketentuan', 'catatan', 'foto_paket'];
+
+    protected $casts = [
+        'tgl_berangkat' => 'date',
+    ];
     public function maskapai()
     {
         return $this->belongsTo(Maskapai::class);

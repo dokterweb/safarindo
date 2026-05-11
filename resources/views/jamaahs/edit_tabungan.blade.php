@@ -9,7 +9,7 @@
         <div class="row row-cards">
           <div class="col-lg-12">
             <div class="card">
-            <form action="{{route('jamaahs.update',$jamaah->id)}}" method="POST" enctype="multipart/form-data"  class="card">
+            <form action="{{ route('jamaahs.update.tabungan', $jamaah->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="card-header bg-yellow">
@@ -19,14 +19,14 @@
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Nama Jamaah</label>
-                            <input type="text" name="nama_jamaah" class="form-control" value="{{$jamaah->nama_jamaah}}">
+                            <input type="text" name="nama_jamaah" class="form-control" value="{{ old('nama_jamaah', $jamaah->nama_jamaah) }}">
                             @error('nama_jamaah')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label class="form-label">NIK</label>
-                            <input type="text" name="nik" class="form-control" value="{{ old('nik', $jamaah->nik ?? '') }}" maxlength="16" pattern="\d{16}" inputmode="numeric">
+                            <label class="form-label">NIK 16 digit</label>
+                            <input type="number" name="nik" class="form-control" value="{{ old('nik', $jamaah->nik ?? '') }}" maxlength="16" pattern="\d{16}" inputmode="numeric">
                             @error('nik')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -40,13 +40,13 @@
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Tanggal Lahir</label>
-                            <input type="date" name="tanggal_lahir" class="form-control" value="{{ \Carbon\Carbon::parse($jamaah->tanggal_lahir)->format('Y-m-d') }}">
+                            <input type="date" name="tanggal_lahir" class="form-control" value="{{ $jamaah->tanggal_lahir }}">
                             @error('tanggal_lahir')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>Kelamin</label>
+                            <label class="form-label">Kelamin</label>
                             <select name="kelamin" class="form-select">
                                 <option value="laki-laki" {{ $jamaah->kelamin == 'laki-laki' ? 'selected' : '' }}>laki-laki</option>
                                 <option value="perempuan" {{ $jamaah->kelamin == 'perempuan' ? 'selected' : '' }}>perempuan</option>
@@ -71,38 +71,28 @@
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Nama Agent</label>
-                            <select name="agent_id" id="agent_id" class="form-select" required>
-                                <option value="NULL">Tidak ada</option>
-                                @foreach ($agents as $a)
-                                    <option value="{{ $a->id }}" {{ $jamaah->agent_id == $a->id ? 'selected' : '' }}>
-                                        {{ $a->user->name }}
+                            <select name="agent_id" class="form-select">
+                                @foreach($agents as $agent)
+                                    <option value="{{ $agent->id }}"
+                                        {{ old('agent_id', $jamaah->agent_id) == $agent->id ? 'selected' : '' }}>
+                                        {{ $agent->user->name }}
                                     </option>
                                 @endforeach
-                            </select>   
+                            </select> 
                         </div>
-                        <div class="col-md-5 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">alamat</label>
                             <input type="text" name="alamat" class="form-control" value="{{$jamaah->alamat  }}">
                             @error('alamat')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="col-md-5 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">catatan</label>
                             <input type="text" name="catatan" class="form-control" value="{{$jamaah->catatan  }}">
                             @error('catatan')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label">Tipe Kamar</label>
-                            <select name="tipe_kamar_id" id="tipe_kamar_id" class="form-select" required>
-                                @foreach ($tipeKamars as $a)
-                                    <option value="{{ $a->id }}" {{ $jamaah->tipe_kamar_id == $a->id ? 'selected' : '' }}>
-                                        {{ $a->nama_kamar }}
-                                    </option>
-                                @endforeach
-                            </select>   
                         </div>
                     </div>
                 </div>

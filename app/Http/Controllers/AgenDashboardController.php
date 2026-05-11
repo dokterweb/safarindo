@@ -70,6 +70,7 @@ class AgenDashboardController extends Controller
 
         $jamaahs = Jamaah::with('paket')
             ->where('agent_id', $agent->id)
+            ->whereNotNull('paket_id')
             ->get();
 
         return view('agen.jamaah', compact('jamaahs'));

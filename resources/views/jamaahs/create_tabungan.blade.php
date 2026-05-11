@@ -24,8 +24,8 @@
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label class="form-label">NIK</label>
-                            <input type="text" name="nik" class="form-control" value="{{ old('nik') }}" maxlength="16" pattern="\d{16}" inputmode="numeric">
+                            <label class="form-label">NIK 16 digit</label>
+                            <input type="number" name="nik" class="form-control" value="{{ old('nik') }}" maxlength="16" pattern="\d{16}" inputmode="numeric">
                             @error('nik')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -45,7 +45,7 @@
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>Kelamin</label>
+                            <label class="form-label">Kelamin</label>
                             <select name="kelamin" class="form-select">
                                 <option value="laki-laki" {{ old('kelamin') == 'laki-laki' ? 'selected' : '' }}>laki-laki</option>
                                 <option value="perempuan" {{ old('kelamin') == 'perempuan' ? 'selected' : '' }}>perempuan</option>

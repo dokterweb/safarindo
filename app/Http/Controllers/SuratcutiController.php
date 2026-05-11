@@ -148,15 +148,15 @@ class SuratcutiController extends Controller
             // 🔥 Tanggal berangkat (MASIH OBJECT)
         $tanggalPergiCarbon = Carbon::parse($paket->tgl_berangkat);
 
-        // 🔥 Tambah jumlah hari dari paket
-        $tanggalKembaliCarbon = $tanggalPergiCarbon->copy()->addDays($paket->jlh_hari);
+        $hari = (int) ($paket->jlh_hari ?? 0);
 
-        // 🔥 Format ke Indonesia
+        $tanggalKembaliCarbon = $tanggalPergiCarbon
+            ->copy()
+            ->addDays($hari);
+
         $tanggalpergi = $tanggalPergiCarbon->translatedFormat('d F Y');
         $tglkembali   = $tanggalKembaliCarbon->translatedFormat('d F Y');
 
-        $tanggalpergi = Carbon::parse($paket->tgl_berangkat)
-            ->translatedFormat('d F Y');
 
         // INIT PDF
         $mpdf = new Mpdf([

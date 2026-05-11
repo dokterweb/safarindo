@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiskonController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\JamaahController;
+use App\Http\Controllers\JamaahPaketProdukController;
 use App\Http\Controllers\KeluarprodukController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MaskapaiController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SuratcutiController;
 use App\Http\Controllers\SuratrekomController;
+use App\Http\Controllers\TipeKamarController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +76,12 @@ Route::post('hotels/store', [HotelController::class, 'store'])->middleware('role
 Route::get('hotels/{hotel}/edit', [HotelController::class, 'edit'])->middleware('role:admin')->name('hotels.edit');
 Route::put('hotels/{hotel}', [HotelController::class, 'update'])->middleware('role:admin')->name('hotels.update');
 
+Route::get('/kamars',[TipeKamarController::class, 'index'])->middleware('role:admin')->name('kamars');
+Route::post('kamars/store', [TipeKamarController::class, 'store'])->middleware('role:admin')->name('kamars.store');
+Route::get('kamars/{tipe_kamar}/edit', [TipeKamarController::class, 'edit'])->middleware('role:admin')->name('kamars.edit');
+Route::put('kamars/{tipe_kamar}', [TipeKamarController::class, 'update'])->middleware('role:admin')->name('kamars.update');
+Route::delete('kamars/{tipe_kamar}', [TipeKamarController::class, 'destroy'])->middleware('role:admin')->name('kamars.destroy');
+
 Route::resource('mitras',MitraController::class)->middleware('role:admin');
 Route::get('/suppliers',[SupplierController::class, 'index'])->middleware('role:admin')->name('suppliers');
 Route::post('suppliers/store', [SupplierController::class, 'store'])->middleware('role:admin')->name('suppliers.store');
@@ -87,8 +95,8 @@ Route::post('pakets/store', [PaketController::class, 'store'])->middleware('role
 Route::get('pakets/{paket}/edit', [PaketController::class, 'edit'])->middleware('role:admin')->name('pakets.edit');
 Route::put('pakets/{paket}', [PaketController::class, 'update'])->middleware('role:admin')->name('pakets.update');
 Route::delete('pakets/{paket}', [PaketController::class, 'destroy'])->middleware('role:admin')->name('pakets.destroy');
-Route::get('/pakets/jamaah',[PaketController::class, 'indexjamaah'])->middleware('role:admin')->name('pakets.jamaah');
-Route::get('/pakets/{id}/jamaah', [PaketController::class, 'byPaket'])->middleware('role:admin')->name('pakets.jamaah.detail');
+Route::get('/pakets/jamaah',[PaketController::class, 'indexjamaah'])->middleware('role:admin|agen')->name('pakets.jamaah');
+Route::get('/pakets/{id}/jamaah', [PaketController::class, 'byPaket'])->middleware('role:admin|agen')->name('pakets.jamaah.detail');
 Route::get('/pakets/pembayaran',[PaketController::class, 'indexpembayaran'])->middleware('role:admin')->name('pakets.pembayaran');
 Route::get('/pakets/{id}/pembayaran', [PaketController::class, 'detailPembayaran'])->middleware('role:admin')->name('pakets.pembayaran.detail');
 
@@ -108,10 +116,16 @@ Route::delete('pengeluaranbulanantrxs/{id}', [PengeluaranbulanantrxController::c
     
 Route::get('/jamaahs/prospek', [JamaahController::class, 'prospek'])->name('jamaahs.prospek');
 Route::get('/jamaahs/create-tabungan', [JamaahController::class, 'createTabungan'])->middleware('role:admin')->name('jamaahs.create.tabungan');
-
 Route::post('/jamaahs/store-tabungan', [JamaahController::class, 'storeTabungan'])
     ->middleware('role:admin')
     ->name('jamaahs.store.tabungan');
+Route::get('/jamaahs/{jamaah}/edit-tabungan', [JamaahController::class, 'editTabungan'])
+    ->middleware('role:admin')
+    ->name('jamaahs.edit.tabungan');
+Route::put('/jamaahs/{jamaah}/update-tabungan', [JamaahController::class, 'updateTabungan'])
+    ->middleware('role:admin')
+    ->name('jamaahs.update.tabungan');
+
 Route::get('/jamaahs/{jamaah}/print-pindah-paket', [JamaahController::class, 'printPindahPaket'])->name('jamaahs.printPindahPaket');
 
 // simpan draft paket
@@ -127,8 +141,8 @@ Route::post('/jamaah/{jamaah}/konfirmasi-paket', [JamaahController::class, 'konf
     ->name('jamaah.konfirmasiPaket');
     
     
-Route::get('/pakets/{id}/jamaah/create', [JamaahController::class, 'createByPaket'])->middleware('role:admin')->name('pakets.jamaah.create');
-Route::post('/pakets/{id}/jamaah/store', [JamaahController::class, 'storeByPaket'])->middleware('role:admin')->name('pakets.jamaah.store');
+Route::get('/pakets/{id}/jamaah/create', [JamaahController::class, 'createByPaket'])->middleware('role:admin|agen')->name('pakets.jamaah.create');
+Route::post('/pakets/{id}/jamaah/store', [JamaahController::class, 'storeByPaket'])->middleware('role:admin|agen')->name('pakets.jamaah.store');
 Route::get('/jamaahs/{id}', [JamaahController::class, 'show'])->middleware('role:admin')->name('jamaahs.show');
 Route::get('/jamaahs/{id}/edit', [JamaahController::class, 'edit'])->middleware('role:admin')->name('jamaahs.edit');
 Route::put('/jamaahs/{id}', [JamaahController::class, 'update'])->middleware('role:admin')->name('jamaahs.update');
@@ -144,6 +158,11 @@ Route::put('/pembayarans/{pembayaran}/update', [PembayaranController::class, 'up
 Route::get('/pembayarans/{jamaah}/print', [PembayaranController::class, 'print'])->middleware('role:admin')->name('pembayarans.print');
 Route::post('/jamaah/{jamaah}/ambil-paket', [JamaahController::class, 'ambilPaket'])
     ->name('jamaah.ambilPaket');
+
+Route::get('/jamaah/{jamaah}/paket-produk', [JamaahPaketProdukController::class, 'index'])->name('jamaah.paket.produk');
+Route::post('/jamaah/paket-produk/store', [JamaahPaketProdukController::class, 'store'])->name('jamaah.paket.produk.store');
+Route::get('/jamaah/{jamaah}/paket-produk/edit', [JamaahPaketProdukController::class, 'edit'])->name('jamaah.paket.produk.edit');
+Route::post('/jamaah/paket-produk/update', [JamaahPaketProdukController::class, 'update'])->name('jamaah.paket.produk.update');
 
 Route::get('/diskons',[DiskonController::class, 'index'])->middleware('role:admin')->name('diskons');
 Route::post('/diskons/{jamaah}', [DiskonController::class, 'store'])->name('diskons.store');
@@ -186,6 +205,8 @@ Route::get('/pembatalans/{pembatalan}/print', [PembatalanController::class, 'pri
 Route::get('/pembatalans', [PembatalanController::class, 'indexsetuju'])->middleware('role:admin')->name('pembatalans');
 Route::post('/pembatalans/store', [PembatalanController::class, 'store'])->middleware('role:admin')->name('pembatalans.store');
 Route::post('/pembatalans/{id}/approve', [PembatalanController::class, 'approve'])->middleware('role:admin')->name('pembatalans.approve');
+Route::delete('/pembatalans/{pembatalan}/hapus',[PembatalanController::class, 'destroy'])->name('pembatalans.destroy');
+
 Route::prefix('pembatalans')->middleware('role:admin')->group(function () {
     Route::get('/{id}', [PembatalanController::class, 'show'])->name('pembatalans.show');
     Route::post('/{id}/approve', [PembatalanController::class, 'approve'])->name('pembatalans.approve');

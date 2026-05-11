@@ -27,6 +27,8 @@
                     <th>Nama Jamaah</th>
                     <th>No HP</th>
                     <th>Kota</th>
+                    <th>Jenis</th>
+                    <th>Status</th>
                     <th class="w-1">Action</th>
                     </tr>
                 </thead>
@@ -37,10 +39,28 @@
                             <td>{{$p->jamaah->nama_jamaah }} </td>
                             <td>{{$p->jamaah->no_hp }} </td>
                             <td>{{$p->jamaah->kota }} </td>
+                            <td>{{$p->jenis }} </td>
+                            <td>{{$p->status }} </td>
                             <td class="d-flex align-items-center" style="gap: 5px;">
-                                <button class="btn btn-sm btn-info btn-detail" data-id="{{ $p->id }}">
+                                <button class="btn btn-sm btn-info btn-detail" data-id="{{ $p->id }}"   data-status="{{ $p->status }}">
                                     Detail
                                 </button>
+                                @if($p->jenis == 'pembatalan')
+
+                                <form action="{{ route('pembatalans.destroy', $p->id) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('Yakin hapus data?')">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button class="btn btn-sm btn-danger">
+                                        Hapus
+                                    </button>
+
+                                </form>
+
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -135,6 +155,16 @@ $(document).ready(function() {
 
 $(document).on('click', '.btn-detail', function () {
     let id = $(this).data('id');
+    let status = $(this).data('status');
+
+     // 🔥 tampil/sembunyikan tombol
+     if (status === 'disetujui') {
+        $('#btnApprove').hide();
+        $('#btnReject').hide();
+    } else {
+        $('#btnApprove').show();
+        $('#btnReject').show();
+    }
 
     $.get('/pembatalans/' + id, function (data) {
 

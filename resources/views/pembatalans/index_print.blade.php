@@ -50,14 +50,10 @@
                 
                             <!-- AKSI -->
                             <td>
-                                @if($d->status == 'pending')
-                                    <a href="{{ route('pembatalans.print', $d->id) }}" 
+                                <a href="{{ route('pembatalans.print', $d->id) }}" 
                                     class="btn btn-sm btn-primary">
                                         Print
                                     </a>
-                                @else
-                                    -
-                                @endif
                             </td>
                 
                         </tr>

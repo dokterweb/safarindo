@@ -48,9 +48,8 @@
                               <td>{{$p->kota }} </td>
                               <td>{{$p->agent->user->name }} </td>
                               <td>
-                                <a href="{{ route('pembayarans.detail', $p->id) }}" class="btn btn-sm btn-primary">
-                                    Nabung
-                                </a>
+                                <a href="{{ route('pembayarans.detail', $p->id) }}" class="btn btn-sm btn-primary">Nabung</a>
+                                <a href="{{ route('jamaahs.edit.tabungan', $p->id) }}" class="btn btn-sm btn-warning">Edit</a>
                               </td>
                           </tr>
                       @empty

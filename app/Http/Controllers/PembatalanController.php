@@ -57,80 +57,97 @@ class PembatalanController extends Controller
         DB::beginTransaction();
     
         try {
-            $pembatalan = Pembatalan::with(['jamaah', 'paket', 'paketTujuan'])
-                ->findOrFail($id);
     
+            $pembatalan = Pembatalan::with(['jamaah','paket','paketTujuan'])->findOrFail($id);
+    
+            // 🔥 CEK STATUS
             if ($pembatalan->status !== 'pending') {
                 throw new \Exception('Permintaan sudah diproses.');
             }
     
             $jamaah = $pembatalan->jamaah;
     
-            // 🔹 Jika Pembatalan
+            // PEMBATALAN
             if ($pembatalan->jenis === 'pembatalan') {
     
-                $jamaah->update([
-                    'status' => 'batal'
-                ]);
+                $jamaah->update(['status' => 'batal']);
     
-                // Simpan transaksi pengembalian dana
+                // TRANSAKSI REFUND
                 Transaksi::create([
-                    'group_id' => 6,
-                    'referensi_id' => $pembatalan->id,
-                    'paket_id' => $pembatalan->paket_id,
-                    'jumlah' => $pembatalan->pengembalian_uang ?? 0,
-                    'keterangan' => 'Pembatalan ' . $jamaah->nama_jamaah .
-                        ' id_jamaah ' . $jamaah->id .
-                        ' : paket = ' . $pembatalan->paket->nama_paket,
+                    'group_id'      => 6,
+                    'referensi_id'  => $pembatalan->id,
+                    'paket_id'      => $pembatalan->paket_id,
+                    'jumlah'        => $pembatalan->pengembalian_uang ?? 0,
+                    'keterangan'    => 'Pembatalan ' .$jamaah->nama_jamaah .' id_jamaah ' .$jamaah->id .' : paket = ' .$pembatalan->paket->nama_paket,
                 ]);
             }
     
-            // 🔹 Jika Pemindahan Paket
+            // PEMINDAHAN PAKET
+            
             if ($pembatalan->jenis === 'pemindahan') {
-
-                $jamaah = $pembatalan->jamaah;
-            
-                // Update paket pada tabel jamaahs
+    
+                $paketLamaId = $pembatalan->paket_id;
+                $paketBaruId = $pembatalan->paket_tujuan_id;
+    
+                $paketBaru = $pembatalan->paketTujuan;
+    
+                // 🔥 HITUNG HARGA FINAL BARU
+                $hargaFinalBaru = $paketBaru->harga_paket;
+    
+                // jika punya tipe kamar
+                if ($jamaah->tipeKamar) {
+                    $hargaFinalBaru +=$jamaah->tipeKamar->harga_kamar;
+                }
+    
+                // 🔥 UPDATE JAMAAH
                 $jamaah->update([
-                    'paket_id' => $pembatalan->paket_tujuan_id,
-                    'status' => 'aktif'
+                    'paket_id'     => $paketBaruId,
+                    'harga_final'  => $hargaFinalBaru,
+                    'status'       => 'aktif',
                 ]);
-            
-                // Ambil ID pembayaran yang terkait dengan paket lama
+    
+                //  PEMBAYARAN
+                
                 $pembayaranIds = DB::table('pembayarans')
                     ->where('jamaah_id', $jamaah->id)
-                    ->where('paket_id', $pembatalan->paket_id)
+                    ->where('paket_id', $paketLamaId)
                     ->pluck('id');
-            
-                // Update paket_id pada tabel pembayarans
-                DB::table('pembayarans')
-                    ->whereIn('id', $pembayaranIds)
-                    ->update([
-                        'paket_id' => $pembatalan->paket_tujuan_id
-                    ]);
-            
-                // Update paket_id pada tabel transaksis
-                DB::table('transaksis')
-                    ->where('group_id', 4) // transaksi pembayaran jamaah
-                    ->whereIn('referensi_id', $pembayaranIds)
-                    ->update([
-                        'paket_id' => $pembatalan->paket_tujuan_id
-                    ]);
+    
+                DB::table('pembayarans')->whereIn('id', $pembayaranIds)->update(['paket_id' => $paketBaruId]);
+    
+                // TRANSAKSI
+                
+                DB::table('transaksis')->where('group_id', 4)->whereIn('referensi_id', $pembayaranIds)->update(['paket_id' => $paketBaruId]);
+    
+                // DISKON
+                DB::table('diskons')->where('jamaah_id', $jamaah->id)->where('paket_id', $paketLamaId)->update(['paket_id' => $paketBaruId]);
+    
+                //  HITUNG ULANG LUNAS
+                
+                $totalBayar = DB::table('pembayarans')->where('jamaah_id', $jamaah->id)->sum('jumlah_bayar');
+    
+                if ($totalBayar >= $hargaFinalBaru) {
+                    $jamaah->update(['lunas' => '1']);
+    
+                } else {
+                    $jamaah->update(['lunas' => '0']);
+                }
             }
     
-            // Update status persetujuan
+            // APPROVE
             $pembatalan->update([
-                'status' => 'disetujui',
-                'disetujui_oleh' => Auth::id(),
-                'disetujui_pada' => Carbon::now(),
+                'status'            => 'disetujui',
+                'disetujui_oleh'    => Auth::id(),
+                'disetujui_pada'    => Carbon::now(),
             ]);
     
             DB::commit();
     
-            return redirect()->back()->with('success', 'Permintaan berhasil disetujui.');
+            return redirect()->back()->with('success','Permintaan berhasil disetujui.');
+    
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', $e->getMessage());
+            return redirect()->back()->with('error',$e->getMessage());
         }
     }
 
@@ -213,4 +230,46 @@ class PembatalanController extends Controller
             'I'
         ))->header('Content-Type', 'application/pdf');
     }
+
+    public function destroy(Pembatalan $pembatalan)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            // 🔥 hanya pembatalan
+            if ($pembatalan->jenis != 'pembatalan') {
+
+                return back()->with(
+                    'error',
+                    'Hanya data pembatalan yang boleh dihapus'
+                );
+            }
+
+            // 🔥 hapus transaksi terkait
+            Transaksi::where('group_id', 6)
+                ->where('referensi_id', $pembatalan->id)
+                ->delete();
+
+            // 🔥 soft delete pembatalan
+            $pembatalan->delete();
+
+            DB::commit();
+
+            return back()->with(
+                'success',
+                'Pembatalan berhasil dihapus'
+            );
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()->with(
+                'error',
+                $e->getMessage()
+            );
+        }
+    }
+
 }

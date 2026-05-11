@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller; 
 use App\Http\Requests\PaketStoreRequest;
 use App\Http\Requests\UpdateStoreRequest;
-use App\Models\Jamaah;
 use App\Models\Maskapai;
 use App\Models\Paket;
 use Illuminate\Http\Request;
@@ -19,16 +18,6 @@ class PaketController extends Controller
         $pakets = Paket::all();
         return view('pakets.index',compact('pakets'));
     }
-
-
-  /*   public function indexpembayaran()
-    {
-        $jamaahs = Jamaah::with('paket')
-            ->withSum('pembayarans as total_bayar', 'jumlah_bayar')
-            ->get();
-    
-        return view('pembayarans.index', compact('jamaahs'));
-    } */
 
     public function create()
     {
@@ -161,10 +150,15 @@ class PaketController extends Controller
         }
     }
 
-    
+
     public function indexjamaah()
     {
-        $pakets = Paket::withCount('jamaahs')->get();
+        $pakets = Paket::withCount([
+            'jamaahs' => function ($q) {
+                $q->where('status', '!=', 'batal');
+            }
+        ])->get();
+
         return view('jamaahs.index', compact('pakets'));
     }
 
@@ -176,7 +170,12 @@ class PaketController extends Controller
 
     public function byPaket($id)
     {
-        $paket = Paket::with('jamaahs')->findOrFail($id);
+        $paket = Paket::with([
+            'jamaahs' => function ($q) {
+                $q->where('status', '!=', 'batal');
+            }
+        ])->findOrFail($id);
+    
         return view('jamaahs.by_paket', compact('paket'));
     }
 

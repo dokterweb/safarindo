@@ -7,6 +7,8 @@ use App\Models\Jamaah;
 use App\Models\Paket;
 use App\Models\Pembayaran;
 use App\Models\Transaksi;
+use App\Models\Diskon;
+use App\Models\Jamaah_paket_produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -14,21 +16,23 @@ use Mpdf\Mpdf;
 
 class PembayaranController extends Controller
 {
-   /*  public function detail($id)
-    {
-        $jamaah = Jamaah::with(['paket', 'pembayarans'])->findOrFail($id);
-
-        $totalBayar = $jamaah->pembayarans->sum('jumlah_bayar');
-        $tagihan = $jamaah->paket->harga_paket;
-        $sisa = $tagihan - $totalBayar;
-
-        return view('pembayarans.detail', compact('jamaah', 'totalBayar', 'tagihan', 'sisa'));
-    } */
-
     public function detail(Jamaah $jamaah)
     {
         $data = $this->getDataPembayaran($jamaah);
-        return view('pembayarans.detail', $data);
+         // 🔥 cek apakah sudah pernah serah terima
+        // 🔥 FIX
+        $sudahSerahTerima = Jamaah_paket_produk::where('jamaah_id', $jamaah->id)->exists();
+        
+        $punyaPembayaranPaket = $jamaah->pembayarans
+        ->where('jenis', 'pembayaran_paket')
+        ->count() > 0;
+    
+        $bolehSerahTerima = !is_null($jamaah->paket_id) && $punyaPembayaranPaket;
+
+        return view('pembayarans.detail', array_merge($data, [
+            'sudahSerahTerima' => $sudahSerahTerima,
+            'bolehSerahTerima' => $bolehSerahTerima
+        ]));
     }
 
     private function getDataPembayaran(Jamaah $jamaah)
@@ -38,7 +42,7 @@ class PembayaranController extends Controller
         // 🔥 pisahkan
         $tabungan = $jamaah->pembayarans->where('jenis', 'tabungan')->sum('jumlah_bayar');
 
-        $pembayaranPaket = $jamaah->pembayarans->where('jenis', 'paket')->sum('jumlah_bayar');
+        $pembayaranPaket = $jamaah->pembayarans->where('jenis', 'pembayaran_paket')->sum('jumlah_bayar');
         $isTabungan = is_null($jamaah->paket_id);
         // 🔥 jika belum punya paket
         if (!$jamaah->paket_id) {
@@ -51,9 +55,48 @@ class PembayaranController extends Controller
             ];
         }
 
-        // 🔥 jika sudah paket
-        $tagihan = $jamaah->paket->harga_paket;
-        $sisa = $tagihan - $pembayaranPaket;
+       //  jika sudah paket
+        $tagihan = $jamaah->harga_final;
+
+        //  ambil diskon
+        $diskon = Diskon::where('jamaah_id', $jamaah->id)
+            ->where('paket_id', $jamaah->paket_id)
+            ->latest()
+            ->first();
+          /*   dd([
+                'jamaah_id' => $jamaah->id,
+                'paket_id' => $jamaah->paket_id,
+            ]); */
+        //  jika diskon approved
+        $jumlahDiskon = 0;
+
+        if ($diskon && $diskon->status == '1') {
+            $jumlahDiskon = $diskon->jumlah_diskon;
+        }
+
+        //  hitung sisa
+        $sisa = ($tagihan - $jumlahDiskon) - $pembayaranPaket;
+
+        $infoDiskon = '<span class="badge bg-secondary">Tidak ada diskon</span>';
+
+        if ($diskon) {
+            if ($diskon->status == '0') {
+                $infoDiskon = '
+                    <span class="badge bg-warning">
+                        Menunggu Persetujuan
+                    </span>
+                    <br>
+                    Rp '.number_format($diskon->jumlah_diskon);
+
+            } elseif ($diskon->status == '1') {
+                $infoDiskon = '
+                    <span class="badge bg-success">
+                        Diskon Disetujui
+                    </span>
+                    <br>
+                    Rp '.number_format($diskon->jumlah_diskon);
+            }
+        }
 
         return [
             'jamaah'        => $jamaah,
@@ -63,7 +106,9 @@ class PembayaranController extends Controller
             'totalTabungan' => $tabungan,
             'mode'          => 'paket',
             'isTabungan'    => $isTabungan,
-            'pakets'        => $pakets
+            'pakets'        => $pakets,
+            'diskon'        => $diskon,
+            'infoDiskon'    => $infoDiskon,
         ];
     }
 
@@ -75,20 +120,39 @@ class PembayaranController extends Controller
             'bukti_bayar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
     
+         // 🔥 CEK STATUS JAMAAH
+        if ($jamaah->status == 'batal') {
+
+            return back()->with(
+                'error',
+                'Jamaah atas nama ' . $jamaah->nama_jamaah . ' sudah dibatalkan.'
+            );
+        }
+
+         // 🔥 CEK STATUS JAMAAH
+        if ($jamaah->lunas == '1') {
+
+            return back()->with(
+                'error',
+                'Jamaah atas nama ' . $jamaah->nama_jamaah . ' sudah lunas.'
+            );
+        }
+        
         DB::beginTransaction();
     
         try {
     
             // 🔥 DETEKSI JENIS
-            $jenis = $jamaah->paket_id ? 'paket' : 'tabungan';
+            $jenis = $jamaah->paket_id ? 'pembayaran_paket' : 'tabungan';
     
             $totalBayar = $jamaah->pembayarans()->sum('jumlah_bayar');
     
             // 🔥 VALIDASI hanya untuk paket
-            if ($jenis === 'paket') {
-                $tagihan = $jamaah->paket->harga_paket;
+            if ($jenis === 'pembayaran_paket') {
+                $tagihan = $jamaah->harga_final ?? $jamaah->paket->harga_paket;
     
                 if (($totalBayar + $request->jumlah_bayar) > $tagihan) {
+                    DB::rollBack();
                     return back()->with('error', 'Pembayaran melebihi tagihan!');
                 }
             }
@@ -123,7 +187,7 @@ class PembayaranController extends Controller
             ]);
     
             // 🔥 UPDATE LUNAS (hanya paket)
-            if ($jenis === 'paket') {
+            if ($jenis === 'pembayaran_paket') {
                 $totalBaru = $totalBayar + $request->jumlah_bayar;
     
                 if ($totalBaru >= $tagihan) {
@@ -235,14 +299,34 @@ class PembayaranController extends Controller
         }
     }
 
-    public function print(Jamaah $jamaah) 
+    public function print(Jamaah $jamaah)
     {
-        $jamaah->load(['paket','pembayarans']);
+        $jamaah->load(['paket', 'pembayarans']);
 
-        // 🔥 HITUNG DATA
+        // 🔥 TOTAL PEMBAYARAN
         $totalBayar = $jamaah->pembayarans->sum('jumlah_bayar');
-        $tagihan = $jamaah->paket->harga_paket;
-        $sisa = $tagihan - $totalBayar;
+
+        // 🔥 DETEKSI TABUNGAN / PAKET
+        $isTabungan = is_null($jamaah->paket_id);
+
+        // 🔥 DEFAULT
+        $tagihan = 0;
+        $sisa = 0;
+        $jumlahDiskon = 0;
+        // 🔥 JIKA SUDAH PAKET
+        if (!$isTabungan && $jamaah->paket) {
+
+            $tagihan = $jamaah->harga_final;
+        
+            // 🔥 AMBIL DISKON APPROVED
+            $jumlahDiskon = Diskon::where('jamaah_id', $jamaah->id)
+                ->where('paket_id', $jamaah->paket_id)
+                ->where('status', '1')
+                ->value('jumlah_diskon') ?? 0;
+        
+            // 🔥 HITUNG SISA
+            $sisa = ($tagihan - $jumlahDiskon) - $totalBayar;
+        }
 
         // 🔥 INIT PDF
         $mpdf = new Mpdf([
@@ -253,20 +337,25 @@ class PembayaranController extends Controller
             'margin_right' => 0,
         ]);
 
-        // 🔥 AKTIFKAN BACKGROUND IMAGE
-        $mpdf->showImageErrors = true; // bantu debug kalau gambar tidak muncul
-        $mpdf->SetDefaultBodyCSS('background', "url('" . public_path('storage/img/backgroundsurat.png') . "')");
-        $mpdf->SetDefaultBodyCSS('background-image-resize', 6); // FULL PAGE
+        // 🔥 BACKGROUND
+        $mpdf->showImageErrors = true;
 
-        // 🔥 KONTEN DARI BLADE
-        $html = view('pembayarans.pdf', compact(
-            'jamaah',
-            'totalBayar',
-            'tagihan',
-            'sisa'
-        ))->render();
+        $mpdf->SetDefaultBodyCSS(
+            'background',
+            "url('" . public_path('storage/img/backgroundsurat.png') . "')"
+        );
 
-        // 🔥 WRAPPER AGAR TIDAK TABRAK HEADER/FOOTER
+        $mpdf->SetDefaultBodyCSS('background-image-resize', 6);
+
+        // 🔥 PILIH VIEW
+        $view = $isTabungan
+            ? 'pembayarans.pdf_tabungan'
+            : 'pembayarans.pdf';
+
+        // 🔥 RENDER VIEW
+        $html = view($view, compact('jamaah','totalBayar','tagihan','sisa','isTabungan','jumlahDiskon'))->render();
+
+        // 🔥 WRAPPER
         $content = '
             <div style="
                 padding-top: 200px;
@@ -280,13 +369,16 @@ class PembayaranController extends Controller
             </div>
         ';
 
-        // 🔥 RENDER
         $mpdf->WriteHTML($content);
 
-        return response($mpdf->Output(
-            'invoice-'.$jamaah->nama_jamaah.'.pdf',
-            'I'
-        ))->header('Content-Type', 'application/pdf');
+        // 🔥 NAMA FILE
+        $namaFile = $isTabungan
+            ? 'tabungan-'.$jamaah->nama_jamaah.'.pdf'
+            : 'invoice-'.$jamaah->nama_jamaah.'.pdf';
+
+        return response(
+            $mpdf->Output($namaFile, 'I')
+        )->header('Content-Type', 'application/pdf');
     }
 
 }

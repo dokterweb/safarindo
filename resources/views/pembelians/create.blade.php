@@ -302,7 +302,7 @@
     $(document).on('change', '.qty', function () {
         let index = $(this).data('index');
         items[index].qty = parseInt($(this).val()) || 1;
-        // renderTable();
+        renderTable();
         hitungTotal();
     });
     

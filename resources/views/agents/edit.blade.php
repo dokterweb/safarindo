@@ -79,14 +79,21 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Fee Agent</label>
+                            <input type="number" name="fee_agent" class="form-control" value="{{$agent->fee_agent}}">
+                            @error('fee_agent')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="col-md-5 mb-3">
                             <label class="form-label">alamat</label>
                             <input type="text" name="alamat" class="form-control" value="{{$agent->alamat}}">
                             @error('alamat')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-5 mb-3">
                             <label class="form-label">catatan</label>
                             <input type="text" name="catatan" class="form-control" value="{{$agent->catatan}}">
                             @error('catatan')

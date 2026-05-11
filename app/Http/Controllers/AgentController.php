@@ -54,6 +54,7 @@ class AgentController extends Controller
                 'kelamin'              => $request->kelamin,
                 'tempat_lahir'         => $request->tempat_lahir,
                 'tanggal_lahir'        => $request->tanggal_lahir,
+                'fee_agent'            => $request->fee_agent,
                 'status'               => $request->status,
                 'foto_agent'           => $request->foto_agent,
                 'alamat'               => $request->alamat,
@@ -107,6 +108,7 @@ class AgentController extends Controller
                 'kelamin'              => $request->kelamin,
                 'tempat_lahir'         => $request->tempat_lahir,
                 'tanggal_lahir'        => $request->tanggal_lahir,
+                'fee_agent'            => $request->fee_agent,
                 'status'               => $request->status,
                 'alamat'               => $request->alamat,
                 'catatan'              => $request->catatan,
@@ -139,7 +141,7 @@ class AgentController extends Controller
             // 3. Hapus user (soft delete)
             if ($user) {$user->delete();}
     
-            return redirect()->route('agents.index')->with('success', 'Agent berhasil dihapus.');
+            return redirect()->route('agents')->with('success', 'Agent berhasil dihapus.');
     
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

@@ -45,11 +45,13 @@
                             <td>{{ number_format($p->harga_paket) }}</td>
                             <td class="d-flex align-items-center" style="gap: 5px;">
                                <a href="{{ route('pakets.jamaah.detail', $p->id) }}" class="btn btn-sm btn-info">Detail</a>
+                               @role('admin')
                                <form method="POST" action="" style="display: inline;" id="delete-form-{{ $p->id }}">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" class="btn btn-sm btn-danger" onclick="deleteConfirmation({{ $p->id }})">Del</button>
                                 </form>
+                                @endrole
                             </td>
                         </tr>
                     @empty

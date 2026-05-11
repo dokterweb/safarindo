@@ -12,9 +12,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Jamaah extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable=['nik', 'nama_jamaah', 'no_hp', 'kota', 'kelamin', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'catatan', 'nama_jamaah_pasport', 'no_pasport', 'penerbit', 'pasport_aktif', 'pasport_expired', 'foto_jamaah', 'foto_ktp', 'foto_kk', 'foto_pasport1', 'foto_pasport2', 'paket_id_draft','paket_id', 'agent_id', 'status', 'lunas'];
+    protected $fillable=['nik', 'nama_jamaah', 'no_hp', 'kota', 'kelamin', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'catatan', 'nama_jamaah_pasport', 'no_pasport', 'penerbit', 'pasport_aktif', 'pasport_expired', 'foto_jamaah', 'foto_ktp', 'foto_kk', 'foto_pasport1', 'foto_pasport2', 'paket_id_draft','paket_id', 'agent_id', 'status', 'lunas','tipe_kamar_id','harga_final'];
     
-    
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+    ];
+    public function tipeKamar()
+    {
+        return $this->belongsTo(Tipe_kamar::class);
+    }
 
     public function paket()
     {

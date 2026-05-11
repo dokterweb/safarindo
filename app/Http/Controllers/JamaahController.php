@@ -7,6 +7,7 @@ use App\Models\Jamaah;
 use App\Models\Paket;
 use App\Models\Pembayaran;
 use App\Models\Transaksi;
+use App\Models\Tipe_kamar;
 use Mpdf\Mpdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -30,21 +31,29 @@ class JamaahController extends Controller
     {
         $paket = Paket::findOrFail($id);
         $agents = Agent::all();
-        return view('jamaahs.create', compact('paket','agents'));
+        $tipeKamars = Tipe_kamar::all();
+        return view('jamaahs.create', compact('paket','agents','tipeKamars'));
     }
 
     public function storeByPaket(StoreJamaahRequest $request, $id)
     {
         $paket = Paket::findOrFail($id);
-
+    
         // 🔥 VALIDASI KUOTA
         if ($paket->jamaahs()->count() >= $paket->kuota) {
             return back()->with('error', 'Kuota paket sudah penuh');
         }
-
-        // 🔥 HANDLE UPLOAD FILE
+    
+        // 🔥 VALIDATED DATA
         $data = $request->validated();
-
+    
+        // 🔥 AMBIL TIPE KAMAR
+        $tipeKamar = Tipe_kamar::findOrFail($data['tipe_kamar_id']);
+    
+        // 🔥 HITUNG HARGA FINAL
+        $hargaFinal = $paket->harga_paket + $tipeKamar->harga_kamar;
+    
+        // 🔥 HANDLE UPLOAD FILE
         $uploadFields = [
             'foto_jamaah',
             'foto_ktp',
@@ -52,46 +61,68 @@ class JamaahController extends Controller
             'foto_pasport1',
             'foto_pasport2'
         ];
-
+    
         foreach ($uploadFields as $field) {
+    
             if ($request->hasFile($field)) {
-                $data[$field] = $request->file($field)->store('jamaah', 'public');
+    
+                $data[$field] = $request
+                    ->file($field)
+                    ->store('jamaah', 'public');
             }
         }
-
-        // 🔥 INSERT DATA
+    
+        // 🔥 DETEKSI AGENT
+        if (auth()->user()->hasRole('agen')) {
+    
+            $agent_id = auth()->user()->agent->id;
+    
+        } else {
+    
+            $agent_id = $data['agent_id'] ?? null;
+        }
+    
+        // 🔥 INSERT JAMAAH
         Jamaah::create([
-            'paket_id' => $paket->id,
-            'agent_id' => $data['agent_id'], // sesuaikan jika relasi agent beda
-            'nik' => $data['nik'],
-            'nama_jamaah' => $data['nama_jamaah'],
-            'no_hp' => $data['no_hp'],
-            'kota' => $data['kota'],
-            'kelamin' => $data['kelamin'],
-            'tempat_lahir' => $data['tempat_lahir'],
-            'tanggal_lahir' => $data['tanggal_lahir'],
-            'alamat' => $data['alamat'],
-            'catatan' => $data['catatan'],
-
-            // Passport
+    
+            // RELASI
+            'paket_id'         => $paket->id,
+            'agent_id'         => $agent_id,
+            'tipe_kamar_id'    => $tipeKamar->id,
+    
+            // HARGA
+            'harga_final'      => $hargaFinal,
+    
+            // DATA JAMAAH
+            'nik'              => $data['nik'],
+            'nama_jamaah'      => $data['nama_jamaah'],
+            'no_hp'            => $data['no_hp'],
+            'kota'             => $data['kota'],
+            'kelamin'          => $data['kelamin'],
+            'tempat_lahir'     => $data['tempat_lahir'],
+            'tanggal_lahir'    => $data['tanggal_lahir'],
+            'alamat'           => $data['alamat'],
+            'catatan'          => $data['catatan'],
+    
+            // PASSPORT
             'nama_jamaah_pasport' => $data['nama_jamaah_pasport'] ?? null,
-            'no_pasport' => $data['no_pasport'] ?? null,
-            'penerbit' => $data['penerbit'] ?? null,
-            'pasport_aktif' => $data['pasport_aktif'] ?? null,
-            'pasport_expired' => $data['pasport_expired'] ?? null,
-
-            // File
-            'foto_jamaah' => $data['foto_jamaah'] ?? null,
-            'foto_ktp' => $data['foto_ktp'] ?? null,
-            'foto_kk' => $data['foto_kk'] ?? null,
-            'foto_pasport1' => $data['foto_pasport1'] ?? null,
-            'foto_pasport2' => $data['foto_pasport2'] ?? null,
-
-            // Default
-            'status' => 'aktif',
-            'lunas' => '0'
+            'no_pasport'          => $data['no_pasport'] ?? null,
+            'penerbit'            => $data['penerbit'] ?? null,
+            'pasport_aktif'       => $data['pasport_aktif'] ?? null,
+            'pasport_expired'     => $data['pasport_expired'] ?? null,
+    
+            // FILE
+            'foto_jamaah'     => $data['foto_jamaah'] ?? null,
+            'foto_ktp'        => $data['foto_ktp'] ?? null,
+            'foto_kk'         => $data['foto_kk'] ?? null,
+            'foto_pasport1'   => $data['foto_pasport1'] ?? null,
+            'foto_pasport2'   => $data['foto_pasport2'] ?? null,
+    
+            // DEFAULT
+            'status'          => 'aktif',
+            'lunas'           => '0',
         ]);
-
+    
         return redirect()
             ->route('pakets.jamaah.detail', $paket->id)
             ->with('success', 'Jamaah berhasil ditambahkan');
@@ -107,15 +138,26 @@ class JamaahController extends Controller
     {
         $jamaah = Jamaah::findOrFail($id);
         $agents = Agent::with('user')->get();
-
-        return view('jamaahs.edit', compact('jamaah', 'agents'));
+        $tipeKamars = Tipe_kamar::all();
+        return view('jamaahs.edit', compact('jamaah', 'agents','tipeKamars'));
     }
 
     public function update(StoreJamaahRequest $request, $id)
     {
         $jamaah = Jamaah::findOrFail($id);
+    
         $data = $request->validated();
-
+    
+        // 🔥 AMBIL PAKET
+        $paket = Paket::findOrFail($jamaah->paket_id);
+    
+        // 🔥 AMBIL TIPE KAMAR
+        $tipeKamar = Tipe_kamar::findOrFail($data['tipe_kamar_id']);
+    
+        // 🔥 HITUNG HARGA FINAL
+        $hargaFinal = $paket->harga_paket + $tipeKamar->harga_kamar;
+    
+        // 🔥 HANDLE UPLOAD
         $uploadFields = [
             'foto_jamaah',
             'foto_ktp',
@@ -123,46 +165,63 @@ class JamaahController extends Controller
             'foto_pasport1',
             'foto_pasport2'
         ];
-
+    
         foreach ($uploadFields as $field) {
+    
             if ($request->hasFile($field)) {
-
-                // hapus file lama jika ada
-                if ($jamaah->$field && Storage::disk('public')->exists($jamaah->$field)) {
+                // 🔥 HAPUS FILE LAMA
+                if (
+                    $jamaah->$field &&
+                    Storage::disk('public')->exists($jamaah->$field)
+                ) {
                     Storage::disk('public')->delete($jamaah->$field);
                 }
-
-                $data[$field] = $request->file($field)->store('jamaah', 'public');
+    
+                // 🔥 UPLOAD BARU
+                $data[$field] = $request
+                    ->file($field)
+                    ->store('jamaah', 'public');
             }
         }
-
+    
+        // 🔥 DETEKSI AGENT
+        if (auth()->user()->hasRole('agen')) {
+            $agent_id = auth()->user()->agent->id;
+        } else {
+            $agent_id = $data['agent_id'] ?? null;
+        }
+    
+        // 🔥 UPDATE DATA
         $jamaah->update([
-            'agent_id' => $data['agent_id'],
-            'nik' => $data['nik'],
-            'nama_jamaah' => $data['nama_jamaah'],
-            'no_hp' => $data['no_hp'],
-            'kota' => $data['kota'],
-            'kelamin' => $data['kelamin'],
-            'tempat_lahir' => $data['tempat_lahir'],
-            'tanggal_lahir' => $data['tanggal_lahir'],
-            'alamat' => $data['alamat'],
-            'catatan' => $data['catatan'],
-
-            // passport
+            // RELASI
+            'agent_id'         => $agent_id,
+            'tipe_kamar_id'    => $tipeKamar->id,
+            // HARGA
+            'harga_final'      => $hargaFinal,
+            // DATA JAMAAH
+            'nik'              => $data['nik'],
+            'nama_jamaah'      => $data['nama_jamaah'],
+            'no_hp'            => $data['no_hp'],
+            'kota'             => $data['kota'],
+            'kelamin'          => $data['kelamin'],
+            'tempat_lahir'     => $data['tempat_lahir'],
+            'tanggal_lahir'    => $data['tanggal_lahir'],
+            'alamat'           => $data['alamat'],
+            'catatan'          => $data['catatan'],
+            // PASSPORT
             'nama_jamaah_pasport' => $data['nama_jamaah_pasport'] ?? null,
-            'no_pasport' => $data['no_pasport'] ?? null,
-            'penerbit' => $data['penerbit'] ?? null,
-            'pasport_aktif' => $data['pasport_aktif'] ?? null,
-            'pasport_expired' => $data['pasport_expired'] ?? null,
-
-            // file
-            'foto_jamaah' => $data['foto_jamaah'] ?? $jamaah->foto_jamaah,
-            'foto_ktp' => $data['foto_ktp'] ?? $jamaah->foto_ktp,
-            'foto_kk' => $data['foto_kk'] ?? $jamaah->foto_kk,
-            'foto_pasport1' => $data['foto_pasport1'] ?? $jamaah->foto_pasport1,
-            'foto_pasport2' => $data['foto_pasport2'] ?? $jamaah->foto_pasport2,
+            'no_pasport'          => $data['no_pasport'] ?? null,
+            'penerbit'            => $data['penerbit'] ?? null,
+            'pasport_aktif'       => $data['pasport_aktif'] ?? null,
+            'pasport_expired'     => $data['pasport_expired'] ?? null,
+            // FILE
+            'foto_jamaah'     => $data['foto_jamaah'] ?? $jamaah->foto_jamaah,
+            'foto_ktp'        => $data['foto_ktp'] ?? $jamaah->foto_ktp,
+            'foto_kk'         => $data['foto_kk'] ?? $jamaah->foto_kk,
+            'foto_pasport1'   => $data['foto_pasport1'] ?? $jamaah->foto_pasport1,
+            'foto_pasport2'   => $data['foto_pasport2'] ?? $jamaah->foto_pasport2,
         ]);
-
+    
         return redirect()
             ->route('jamaahs.show', $jamaah->id)
             ->with('success', 'Data jamaah berhasil diupdate');
@@ -206,6 +265,8 @@ class JamaahController extends Controller
             'tanggal_lahir' => $data['tanggal_lahir'],
             'alamat' => $data['alamat'],
             'catatan' => $data['catatan'],
+            'tipe_kamar_id' => '1',
+            'harga_final' => 0,
 
             // Passport
             'nama_jamaah_pasport' => $data['nama_jamaah_pasport'] ?? null,
@@ -229,6 +290,78 @@ class JamaahController extends Controller
         return redirect()
             ->route('jamaahs.prospek')
             ->with('success', 'Jamaah berhasil ditambahkan');
+    }
+
+    public function editTabungan(Jamaah $jamaah)
+    {
+        $agents = Agent::all();
+        return view('jamaahs.edit_tabungan', compact('jamaah', 'agents'));
+    }
+
+    public function updateTabungan(StoreJamaahRequest $request, Jamaah $jamaah)
+    {
+        $data = $request->validated();
+
+        // FIELD FILE
+        $uploadFields = [
+            'foto_jamaah',
+            'foto_ktp',
+            'foto_kk',
+            'foto_pasport1',
+            'foto_pasport2'
+        ];
+
+        foreach ($uploadFields as $field) {
+
+            // jika upload file baru
+            if ($request->hasFile($field)) {
+
+                // hapus file lama jika ada
+                if ($jamaah->$field && Storage::disk('public')->exists($jamaah->$field)) {
+                    Storage::disk('public')->delete($jamaah->$field);
+                }
+
+                // upload file baru
+                $data[$field] = $request->file($field)->store('jamaah', 'public');
+            } else {
+
+                // jika tidak upload baru, pakai file lama
+                $data[$field] = $jamaah->$field;
+            }
+        }
+
+        // UPDATE DATA
+        $jamaah->update([
+
+            'agent_id' => $data['agent_id'],
+            'nik' => $data['nik'],
+            'nama_jamaah' => $data['nama_jamaah'],
+            'no_hp' => $data['no_hp'],
+            'kota' => $data['kota'],
+            'kelamin' => $data['kelamin'],
+            'tempat_lahir' => $data['tempat_lahir'],
+            'tanggal_lahir' => $data['tanggal_lahir'],
+            'alamat' => $data['alamat'],
+            'catatan' => $data['catatan'],
+
+            // passport
+            'nama_jamaah_pasport' => $data['nama_jamaah_pasport'] ?? null,
+            'no_pasport' => $data['no_pasport'] ?? null,
+            'penerbit' => $data['penerbit'] ?? null,
+            'pasport_aktif' => $data['pasport_aktif'] ?? null,
+            'pasport_expired' => $data['pasport_expired'] ?? null,
+
+            // file
+            'foto_jamaah' => $data['foto_jamaah'],
+            'foto_ktp' => $data['foto_ktp'],
+            'foto_kk' => $data['foto_kk'],
+            'foto_pasport1' => $data['foto_pasport1'],
+            'foto_pasport2' => $data['foto_pasport2'],
+        ]);
+
+        return redirect()
+            ->route('jamaahs.prospek')
+            ->with('success', 'Data jamaah berhasil diupdate');
     }
 
     public function ambilPaket(Request $request, Jamaah $jamaah)

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('hotel_makah_id');
             $table->string('hotel_madinah_id');
             $table->string('hotel_transit_id');
+            $table->integer('tipe_kamar_id');
             $table->unsignedBigInteger('harga_paket');
             $table->text('include_desc')->nullable();
             $table->text('exclude_desc')->nullable();
